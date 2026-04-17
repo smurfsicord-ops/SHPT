@@ -1,0 +1,10 @@
+<nav id="MobileNav" class="mobile-nav" role="dialog" aria-label="Menu mobile" aria-modal="true">
+  <button id="MobileMenuClose" class="mobile-nav-close" aria-label="Fermer le menu">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+  </button>
+  <div class="mobile-nav-links">
+    {%- for link in linklists['main-menu'].links -%}
+      <a href="{{ link.url }}">{{ link.title }}</a>
+    {%- endfor -%}
+  </div>
+</nav>

@@ -1,0 +1,432 @@
+{
+  "sections": {
+    "hero": {
+      "type": "hero",
+      "settings": {
+        "eyebrow": "Soin naturel premium",
+        "title": "La nature au service de votre **beauté**",
+        "description": "Des soins formulés avec les actifs les plus purs, pour révéler l'éclat naturel de votre peau chaque jour.",
+        "btn1_label": "Découvrir la gamme",
+        "btn1_url": "/collections/all",
+        "btn2_label": "Notre histoire",
+        "btn2_url": "/pages/about",
+        "stat1_num": "98%",
+        "stat1_label": "Ingrédients naturels",
+        "stat2_num": "50k+",
+        "stat2_label": "Clientes satisfaites",
+        "stat3_num": "4.9★",
+        "stat3_label": "Note moyenne"
+      }
+    },
+    "features-bar": {
+      "type": "features-bar",
+      "blocks": {
+        "feat1": {
+          "type": "feature",
+          "settings": {
+            "icon": "truck",
+            "title": "Livraison offerte",
+            "desc": "Dès 49€ d'achat"
+          }
+        },
+        "feat2": {
+          "type": "feature",
+          "settings": {
+            "icon": "leaf",
+            "title": "100% Naturel",
+            "desc": "Formules certifiées bio"
+          }
+        },
+        "feat3": {
+          "type": "feature",
+          "settings": {
+            "icon": "shield",
+            "title": "Satisfait ou remboursé",
+            "desc": "Garantie 30 jours"
+          }
+        },
+        "feat4": {
+          "type": "feature",
+          "settings": {
+            "icon": "refresh",
+            "title": "Retours gratuits",
+            "desc": "Échanges simplifiés"
+          }
+        }
+      },
+      "block_order": [
+        "feat1",
+        "feat2",
+        "feat3",
+        "feat4"
+      ],
+      "settings": {}
+    },
+    "featured-collection": {
+      "type": "featured-collection",
+      "blocks": {
+        "prod1": {
+          "type": "product",
+          "settings": {
+            "type": "Flux Léger",
+            "name": "Sérum Hydratant Éclat",
+            "price": "39,90 €",
+            "compare_price": "49,90 €",
+            "badge": "Bestseller"
+          }
+        },
+        "prod2": {
+          "type": "product",
+          "settings": {
+            "type": "Flux Moyen",
+            "name": "Crème Nourrissante Profonde",
+            "price": "44,90 €",
+            "compare_price": "",
+            "badge": "Nouveau"
+          }
+        },
+        "prod3": {
+          "type": "product",
+          "settings": {
+            "type": "Flux Intense",
+            "name": "Huile Régénérante Nuit",
+            "price": "54,90 €",
+            "compare_price": "64,90 €",
+            "badge": ""
+          }
+        }
+      },
+      "block_order": [
+        "prod1",
+        "prod2",
+        "prod3"
+      ],
+      "settings": {
+        "eyebrow": "Notre gamme",
+        "title": "Nos soins **signature**",
+        "description": "Chaque formule est pensée pour s'adapter à votre peau et révéler son éclat naturel.",
+        "cta_label": "Voir toute la gamme",
+        "cta_url": "/collections/all"
+      }
+    },
+    "absorption-guide": {
+      "type": "absorption-guide",
+      "blocks": {
+        "lv1": {
+          "type": "level",
+          "settings": {
+            "name": "Flux Léger",
+            "description": "Peaux normales à mixtes",
+            "drops": 1,
+            "badge": "Absorption 30min",
+            "badge_bg": "#e8f5e9",
+            "badge_color": "#2e7d32"
+          }
+        },
+        "lv2": {
+          "type": "level",
+          "settings": {
+            "name": "Flux Moyen",
+            "description": "Peaux sèches, nutrition ciblée",
+            "drops": 2,
+            "badge": "Absorption 2h",
+            "badge_bg": "#fff8e1",
+            "badge_color": "#f57f17"
+          }
+        },
+        "lv3": {
+          "type": "level",
+          "settings": {
+            "name": "Flux Intense",
+            "description": "Peaux très sèches, réparation",
+            "drops": 3,
+            "badge": "Absorption 4h",
+            "badge_bg": "#fce4ec",
+            "badge_color": "#c62828"
+          }
+        },
+        "lv4": {
+          "type": "level",
+          "settings": {
+            "name": "Flux Nuit",
+            "description": "Soin régénérateur nocturne",
+            "drops": 4,
+            "badge": "Action nocturne",
+            "badge_bg": "#ede7f6",
+            "badge_color": "#4527a0"
+          }
+        }
+      },
+      "block_order": [
+        "lv1",
+        "lv2",
+        "lv3",
+        "lv4"
+      ],
+      "settings": {
+        "eyebrow": "Comment choisir",
+        "title": "Trouvez votre **flux idéal**",
+        "description": "Chaque peau est unique. Nos formules s'adaptent à votre type de peau pour une absorption optimale.",
+        "cta_label": "Faire le diagnostic",
+        "cta_url": "/pages/diagnostic"
+      }
+    },
+    "packs": {
+      "type": "packs",
+      "blocks": {
+        "pk1": {
+          "type": "pack",
+          "settings": {
+            "name": "Pack Découverte",
+            "contents": "Sérum + Crème Légère",
+            "saving": "Économisez 15%",
+            "price": "69,90 €",
+            "compare_price": "83,80 €"
+          }
+        },
+        "pk2": {
+          "type": "pack",
+          "settings": {
+            "name": "Pack Routine Complète",
+            "contents": "Sérum + Crème + Huile Nuit",
+            "saving": "Économisez 22%",
+            "price": "99,90 €",
+            "compare_price": "128,70 €"
+          }
+        },
+        "pk3": {
+          "type": "pack",
+          "settings": {
+            "name": "Pack Intensif",
+            "contents": "Sérum x2 + Masque + Huile",
+            "saving": "Économisez 28%",
+            "price": "119,90 €",
+            "compare_price": "166,60 €"
+          }
+        },
+        "pk4": {
+          "type": "pack",
+          "settings": {
+            "name": "Pack Best-Sellers",
+            "contents": "Nos 4 produits signature",
+            "saving": "Économisez 30%",
+            "price": "139,90 €",
+            "compare_price": "199,60 €"
+          }
+        }
+      },
+      "block_order": [
+        "pk1",
+        "pk2",
+        "pk3",
+        "pk4"
+      ],
+      "settings": {
+        "eyebrow": "Nos offres",
+        "title": "Packs **Everyday**",
+        "description": "Économisez jusqu'à 30% en optant pour nos packs soigneusement composés."
+      }
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "r1": {
+          "type": "review",
+          "settings": {
+            "stars": 5,
+            "text": "Une texture incroyable, ma peau est visiblement plus lumineuse dès la première semaine. Je recommande les yeux fermés !",
+            "author": "Sophie M.",
+            "city": "Paris",
+            "verified": true
+          }
+        },
+        "r2": {
+          "type": "review",
+          "settings": {
+            "stars": 5,
+            "text": "J'ai enfin trouvé une crème qui convient à ma peau sensible. Aucune rougeur, un confort immédiat. Merci Octipa !",
+            "author": "Camille L.",
+            "city": "Lyon",
+            "verified": true
+          }
+        },
+        "r3": {
+          "type": "review",
+          "settings": {
+            "stars": 5,
+            "text": "Le sérum est devenu indispensable dans ma routine. Mon teint est unifié et éclatant. Je suis totalement fan.",
+            "author": "Marie P.",
+            "city": "Bordeaux",
+            "verified": true
+          }
+        },
+        "r4": {
+          "type": "review",
+          "settings": {
+            "stars": 5,
+            "text": "Qualité irréprochable, formules naturelles qui sentent divinement bon. Je ne peux plus m'en passer.",
+            "author": "Léa R.",
+            "city": "Marseille",
+            "verified": true
+          }
+        },
+        "r5": {
+          "type": "review",
+          "settings": {
+            "stars": 5,
+            "text": "Le pack routine complète est parfait. Mes rides sont moins visibles en moins de 3 semaines. Bluffant.",
+            "author": "Isabelle D.",
+            "city": "Nantes",
+            "verified": true
+          }
+        },
+        "r6": {
+          "type": "review",
+          "settings": {
+            "stars": 5,
+            "text": "Service client impeccable et produits d'une efficacité remarquable. Ma peau n'a jamais été aussi belle.",
+            "author": "Julie B.",
+            "city": "Toulouse",
+            "verified": true
+          }
+        }
+      },
+      "block_order": [
+        "r1",
+        "r2",
+        "r3",
+        "r4",
+        "r5",
+        "r6"
+      ],
+      "settings": {
+        "eyebrow": "Elles nous font confiance",
+        "title": "Ce qu'elles **disent de nous**",
+        "description": "Plus de 50 000 clientes ont adopté nos soins dans leur routine quotidienne."
+      }
+    },
+    "faq": {
+      "type": "faq",
+      "blocks": {
+        "q1": {
+          "type": "question",
+          "settings": {
+            "question": "Comment choisir mon flux d'absorption ?",
+            "answer": "Notre diagnostic en ligne analyse votre type de peau en 2 minutes et vous recommande le flux idéal."
+          }
+        },
+        "q2": {
+          "type": "question",
+          "settings": {
+            "question": "Les formules sont-elles vraiment naturelles ?",
+            "answer": "Oui, 98% de nos ingrédients sont d'origine naturelle, certifiés bio quand possible. Sans parabènes, sulfates ni parfums synthétiques."
+          }
+        },
+        "q3": {
+          "type": "question",
+          "settings": {
+            "question": "Combien de temps avant de voir des résultats ?",
+            "answer": "La majorité de nos clientes observent une amélioration dès la première semaine. Pour des résultats optimaux, comptez 4 à 6 semaines."
+          }
+        },
+        "q4": {
+          "type": "question",
+          "settings": {
+            "question": "Puis-je retourner ma commande ?",
+            "answer": "Absolument ! Vous bénéficiez de 30 jours pour retourner tout article non ouvert."
+          }
+        },
+        "q5": {
+          "type": "question",
+          "settings": {
+            "question": "Quand est-ce que je serai livré(e) ?",
+            "answer": "Les commandes avant 14h sont expédiées le jour même. Comptez 2-3 jours ouvrés en France métropolitaine."
+          }
+        },
+        "q6": {
+          "type": "question",
+          "settings": {
+            "question": "Vos produits conviennent-ils aux peaux sensibles ?",
+            "answer": "Oui, tous nos produits sont testés dermatologiquement et ont la certification hypoallergénique."
+          }
+        }
+      },
+      "block_order": [
+        "q1",
+        "q2",
+        "q3",
+        "q4",
+        "q5",
+        "q6"
+      ],
+      "settings": {
+        "eyebrow": "Vos questions",
+        "title": "Questions **fréquentes**"
+      }
+    },
+    "featured-blog": {
+      "type": "featured-blog",
+      "blocks": {
+        "a1": {
+          "type": "article",
+          "settings": {
+            "category": "Routine",
+            "title": "5 gestes pour une peau éclatante au quotidien",
+            "excerpt": "Découvrez les rituels de soin qui font vraiment la différence pour une peau lumineuse et hydratée."
+          }
+        },
+        "a2": {
+          "type": "article",
+          "settings": {
+            "category": "Ingrédients",
+            "title": "L'huile de rosier muscat, l'or de nos formules",
+            "excerpt": "Zoom sur cet ingrédient star sélectionné pour ses propriétés régénératrices exceptionnelles."
+          }
+        },
+        "a3": {
+          "type": "article",
+          "settings": {
+            "category": "Conseil",
+            "title": "Comment adapter sa routine selon les saisons",
+            "excerpt": "Votre peau a des besoins différents en hiver et en été. Voici comment ajuster votre routine beauté."
+          }
+        }
+      },
+      "block_order": [
+        "a1",
+        "a2",
+        "a3"
+      ],
+      "settings": {
+        "eyebrow": "Le journal Octipa",
+        "title": "Nos **conseils beauté**",
+        "description": "Conseils d'experts, rituels beauté et actualités de nos formulations.",
+        "cta_label": "Voir tous les articles",
+        "cta_url": "/blogs/news"
+      }
+    },
+    "cta-banner": {
+      "type": "cta-banner",
+      "settings": {
+        "eyebrow": "Prête à transformer votre peau ?",
+        "title": "Commencez votre **ritual beauté**",
+        "description": "Rejoignez plus de 50 000 femmes qui ont adopté Octipa. Livraison offerte dès 49€.",
+        "btn1_label": "Découvrir la boutique",
+        "btn1_url": "/collections/all",
+        "btn2_label": "Faire le diagnostic",
+        "btn2_url": "/pages/diagnostic"
+      }
+    }
+  },
+  "order": [
+    "hero",
+    "features-bar",
+    "featured-collection",
+    "absorption-guide",
+    "packs",
+    "testimonials",
+    "faq",
+    "featured-blog",
+    "cta-banner"
+  ]
+}

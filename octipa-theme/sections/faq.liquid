@@ -1,0 +1,54 @@
+{%- assign title_parts = section.settings.title | split: '**' -%}
+<section class="section section-bg">
+  <div class="container">
+    <div class="section-header fade-up">
+      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2 class="section-title">
+        {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
+      </h2>
+      <div class="section-divider"></div>
+    </div>
+    <div class="faq-list">
+      {%- for block in section.blocks -%}
+        <div class="faq-item fade-up" style="transition-delay:{{ forloop.index0 | times: 60 }}ms" {{ block.shopify_attributes }}>
+          <button class="faq-btn" aria-expanded="false">
+            {{ block.settings.question }}
+            <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+          </button>
+          <div class="faq-body">{{ block.settings.answer }}</div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "FAQ",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Vos questions" },
+    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Questions **fréquentes**" }
+  ],
+  "blocks": [{
+    "type": "question",
+    "name": "Question",
+    "settings": [
+      { "type": "text", "id": "question", "label": "Question", "default": "Comment choisir mon produit ?" },
+      { "type": "textarea", "id": "answer", "label": "Réponse", "default": "Nous vous recommandons de faire notre diagnostic peau en ligne pour trouver la formule idéale." }
+    ]
+  }],
+  "presets": [{
+    "name": "FAQ",
+    "blocks": [
+      { "type": "question", "settings": { "question": "Comment choisir mon flux d'absorption ?", "answer": "Notre diagnostic en ligne analyse votre type de peau en 2 minutes et vous recommande le flux idéal. Flux léger pour peaux normales à mixtes, flux intense pour peaux très sèches." } },
+      { "type": "question", "settings": { "question": "Les formules sont-elles vraiment naturelles ?", "answer": "Oui, 98% de nos ingrédients sont d'origine naturelle, certifiés bio quand possible. Nos formules sont exemptes de parabènes, sulfates, colorants artificiels et parfums synthétiques." } },
+      { "type": "question", "settings": { "question": "Combien de temps avant de voir des résultats ?", "answer": "La majorité de nos clientes observent une amélioration dès la première semaine. Pour des résultats optimaux, comptez 4 à 6 semaines d'utilisation régulière." } },
+      { "type": "question", "settings": { "question": "Puis-je retourner ma commande ?", "answer": "Absolument ! Vous bénéficiez de 30 jours pour retourner tout article non ouvert. Notre service client est disponible 7j/7." } },
+      { "type": "question", "settings": { "question": "Quand est-ce que je serai livré(e) ?", "answer": "Les commandes passées avant 14h sont expédiées le jour même. Comptez 2-3 jours ouvrés pour la France métropolitaine." } },
+      { "type": "question", "settings": { "question": "Vos produits sont-ils testés dermatologiquement ?", "answer": "Tous nos produits sont testés sous contrôle dermatologique. Ils conviennent aux peaux sensibles et ont obtenu la certification hypoallergénique." } }
+    ]
+  }]
+}
+{% endschema %}

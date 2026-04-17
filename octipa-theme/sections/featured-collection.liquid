@@ -1,0 +1,78 @@
+{%- assign title_parts = section.settings.title | split: '**' -%}
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-up">
+      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2 class="section-title">
+        {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
+      </h2>
+      <p class="section-desc">{{ section.settings.description }}</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="products-grid">
+      {%- for block in section.blocks -%}
+        <article class="product-card fade-up" style="transition-delay:{{ forloop.index0 | times: 100 }}ms" {{ block.shopify_attributes }}>
+          <a href="{{ block.settings.url | default: '/collections/all' }}" class="product-card-img-wrap" aria-label="{{ block.settings.name }}">
+            {%- if block.settings.badge != blank -%}<span class="product-badge">{{ block.settings.badge }}</span>{%- endif -%}
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | img_url: '600x800', crop: 'center' | img_tag: block.settings.name, 'loading="lazy" width="600" height="800"' }}
+            {%- else -%}
+              <img src="{{ 'hero-secondary.jpg' | asset_url }}" alt="{{ block.settings.name | escape }}" width="600" height="800" loading="lazy">
+            {%- endif -%}
+          </a>
+          <div class="product-card-body">
+            <p class="product-type">{{ block.settings.type }}</p>
+            <h3 class="product-name"><a href="{{ block.settings.url | default: '/collections/all' }}">{{ block.settings.name }}</a></h3>
+            <div class="product-price-row">
+              <span class="product-price">{{ block.settings.price }}</span>
+              {%- if block.settings.compare_price != blank -%}<span class="product-compare">{{ block.settings.compare_price }}</span>{%- endif -%}
+            </div>
+            <div class="product-card-actions">
+              <button class="btn btn--primary js-add-to-cart">Ajouter au panier</button>
+              <a href="{{ block.settings.url | default: '/collections/all' }}" class="btn btn--outline">Voir le produit</a>
+            </div>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+    {%- if section.settings.cta_label != blank -%}
+      <div style="text-align:center;margin-top:2.5rem">
+        <a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="btn btn--outline btn--lg">{{ section.settings.cta_label }}</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Collection vedette",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Notre gamme" },
+    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Nos soins **signature**" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Chaque formule est pensée pour s'adapter à votre peau et révéler son éclat naturel." },
+    { "type": "text", "id": "cta_label", "label": "Bouton voir tout (texte)", "default": "Voir toute la gamme" },
+    { "type": "url", "id": "cta_url", "label": "Bouton voir tout (lien)", "default": "/collections/all" }
+  ],
+  "blocks": [{
+    "type": "product",
+    "name": "Produit",
+    "settings": [
+      { "type": "image_picker", "id": "image", "label": "Photo" },
+      { "type": "text", "id": "type", "label": "Gamme", "default": "Flux Léger" },
+      { "type": "text", "id": "name", "label": "Nom du produit", "default": "Sérum Hydratant Éclat" },
+      { "type": "text", "id": "price", "label": "Prix", "default": "39,90 €" },
+      { "type": "text", "id": "compare_price", "label": "Prix barré (optionnel)", "default": "" },
+      { "type": "text", "id": "badge", "label": "Badge (optionnel)", "default": "Bestseller" },
+      { "type": "url", "id": "url", "label": "Lien produit" }
+    ]
+  }],
+  "presets": [{
+    "name": "Collection vedette",
+    "blocks": [
+      { "type": "product", "settings": { "type": "Flux Léger", "name": "Sérum Hydratant Éclat", "price": "39,90 €", "compare_price": "49,90 €", "badge": "Bestseller" } },
+      { "type": "product", "settings": { "type": "Flux Moyen", "name": "Crème Nourrissante Profonde", "price": "44,90 €", "compare_price": "", "badge": "Nouveau" } },
+      { "type": "product", "settings": { "type": "Flux Intense", "name": "Huile Régénérante Nuit", "price": "54,90 €", "compare_price": "64,90 €", "badge": "" } }
+    ]
+  }]
+}
+{% endschema %}

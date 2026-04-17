@@ -1,0 +1,28 @@
+<section class="section">
+  <div class="container container--narrow">
+    <h1 class="section-title" style="margin-bottom:2rem">Mon panier</h1>
+    {%- if cart.item_count == 0 -%}
+      <div style="text-align:center;padding:4rem 0;color:var(--color-text-muted)">
+        <p style="margin-bottom:1.5rem">Votre panier est vide.</p>
+        <a href="/collections/all" class="btn btn--primary btn--lg">Continuer mes achats</a>
+      </div>
+    {%- else -%}
+      {%- for item in cart.items -%}
+        <div class="cart-item">
+          <img src="{{ item.image | img_url: '160x200', crop: 'center' }}" alt="{{ item.title | escape }}" width="80" height="100" loading="lazy">
+          <div>
+            <div class="cart-item-name">{{ item.product.title }}</div>
+            <div class="cart-item-variant">{{ item.variant.title }}</div>
+            <div class="cart-item-price">{{ item.final_line_price | money }}</div>
+          </div>
+          <a href="/cart/change?line={{ forloop.index }}&quantity=0" class="cart-item-remove" aria-label="Supprimer {{ item.product.title | escape }}">&#215;</a>
+        </div>
+      {%- endfor -%}
+      <div style="border-top:1px solid var(--color-divider);padding-top:1.5rem;margin-top:1rem;text-align:right">
+        <p style="font-size:var(--text-lg);font-weight:700;margin-bottom:1rem">Total : {{ cart.total_price | money }}</p>
+        <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:1.5rem">&#10003; Livraison offerte dès 49€</p>
+        <a href="/checkout" class="btn btn--primary btn--lg">Commander →</a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>

@@ -1,0 +1,71 @@
+{%- assign title_parts = section.settings.title | split: '**' -%}
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-up">
+      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2 class="section-title">
+        {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
+      </h2>
+      <p class="section-desc">{{ section.settings.description }}</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="packs-grid">
+      {%- for block in section.blocks -%}
+        <article class="pack-card fade-up" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}>
+          <div class="pack-img">
+            {%- if block.settings.image != blank -%}
+              {{ block.settings.image | img_url: '500x620', crop: 'center' | img_tag: block.settings.name, 'loading="lazy" width="500" height="620"' }}
+            {%- else -%}
+              <img src="{{ 'hero-secondary.jpg' | asset_url }}" alt="{{ block.settings.name | escape }}" width="500" height="620" loading="lazy">
+            {%- endif -%}
+          </div>
+          <div class="pack-body">
+            <p class="pack-type">{{ block.settings.contents }}</p>
+            <h3 class="pack-name">{{ block.settings.name }}</h3>
+            <span class="pack-saving">{{ block.settings.saving }}</span>
+            <div>
+              <span class="pack-price">{{ block.settings.price }}</span>
+              {%- if block.settings.compare_price != blank -%}
+                <span class="pack-compare"> {{ block.settings.compare_price }}</span>
+              {%- endif -%}
+            </div>
+            <a href="{{ block.settings.url | default: '/collections/packs' }}" class="btn btn--gold">Choisir ce pack</a>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Packs Everyday",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Nos offres" },
+    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Packs **Everyday**" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Économisez jusqu'à 30% en optant pour nos packs soigneusement composés." }
+  ],
+  "blocks": [{
+    "type": "pack",
+    "name": "Pack",
+    "settings": [
+      { "type": "image_picker", "id": "image", "label": "Image du pack" },
+      { "type": "text", "id": "name", "label": "Nom", "default": "Pack Découverte" },
+      { "type": "text", "id": "contents", "label": "Contenu", "default": "Sérum + Crème Légère" },
+      { "type": "text", "id": "saving", "label": "Économie", "default": "Économisez 15%" },
+      { "type": "text", "id": "price", "label": "Prix", "default": "69,90 €" },
+      { "type": "text", "id": "compare_price", "label": "Prix barré", "default": "83,80 €" },
+      { "type": "url", "id": "url", "label": "Lien" }
+    ]
+  }],
+  "presets": [{
+    "name": "Packs Everyday",
+    "blocks": [
+      { "type": "pack", "settings": { "name": "Pack Découverte", "contents": "Sérum + Crème Légère", "saving": "Économisez 15%", "price": "69,90 €", "compare_price": "83,80 €" } },
+      { "type": "pack", "settings": { "name": "Pack Routine Complète", "contents": "Sérum + Crème + Huile Nuit", "saving": "Économisez 22%", "price": "99,90 €", "compare_price": "128,70 €" } },
+      { "type": "pack", "settings": { "name": "Pack Intensif", "contents": "Sérum x2 + Masque + Huile", "saving": "Économisez 28%", "price": "119,90 €", "compare_price": "166,60 €" } },
+      { "type": "pack", "settings": { "name": "Pack Best-Sellers", "contents": "Nos 4 produits signature", "saving": "Économisez 30%", "price": "139,90 €", "compare_price": "199,60 €" } }
+    ]
+  }]
+}
+{% endschema %}

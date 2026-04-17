@@ -1,0 +1,62 @@
+{%- assign title_parts = section.settings.title | split: '**' -%}
+<section class="section">
+  <div class="container">
+    <div class="section-header fade-up">
+      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      <h2 class="section-title">
+        {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
+      </h2>
+      <p class="section-desc">{{ section.settings.description }}</p>
+      <div class="section-divider"></div>
+    </div>
+    <div class="testimonials-grid">
+      {%- for block in section.blocks -%}
+        <div class="testimonial-card fade-up" style="transition-delay:{{ forloop.index0 | times: 80 }}ms" {{ block.shopify_attributes }}>
+          <div class="stars">
+            {%- for i in (1..block.settings.stars) -%}★{%- endfor -%}
+          </div>
+          <p class="testimonial-text">« {{ block.settings.text }} »</p>
+          <div>
+            <div class="testimonial-author">{{ block.settings.author }} — {{ block.settings.city }}</div>
+            {%- if block.settings.verified -%}
+              <div class="testimonial-verified">✓ Achat vérifié</div>
+            {%- endif -%}
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Témoignages",
+  "settings": [
+    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Elles nous font confiance" },
+    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Ce qu'elles **disent de nous**" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Plus de 50 000 clientes ont adopté nos soins dans leur routine quotidienne." }
+  ],
+  "blocks": [{
+    "type": "review",
+    "name": "Avis",
+    "settings": [
+      { "type": "range", "id": "stars", "label": "Étoiles", "min": 1, "max": 5, "step": 1, "default": 5 },
+      { "type": "textarea", "id": "text", "label": "Texte", "default": "Une texture incroyable, ma peau est visiblement plus lumineuse dès la première semaine !" },
+      { "type": "text", "id": "author", "label": "Prénom Initiale", "default": "Sophie M." },
+      { "type": "text", "id": "city", "label": "Ville", "default": "Paris" },
+      { "type": "checkbox", "id": "verified", "label": "Achat vérifié", "default": true }
+    ]
+  }],
+  "presets": [{
+    "name": "Témoignages",
+    "blocks": [
+      { "type": "review", "settings": { "stars": 5, "text": "Une texture incroyable, ma peau est visiblement plus lumineuse dès la première semaine. Je recommande les yeux fermés !", "author": "Sophie M.", "city": "Paris", "verified": true } },
+      { "type": "review", "settings": { "stars": 5, "text": "J'ai enfin trouvé une crème qui convient à ma peau sensible. Aucune rougeur, un confort immédiat. Merci Octipa !", "author": "Camille L.", "city": "Lyon", "verified": true } },
+      { "type": "review", "settings": { "stars": 5, "text": "Le sérum est devenu indispensable dans ma routine. Mon teint est unifié et éclatant. Je suis totalement fan.", "author": "Marie P.", "city": "Bordeaux", "verified": true } },
+      { "type": "review", "settings": { "stars": 5, "text": "Qualité irréprochable, formules naturelles qui sentent divinement bon. Je ne peux plus m'en passer.", "author": "Léa R.", "city": "Marseille", "verified": true } },
+      { "type": "review", "settings": { "stars": 5, "text": "Le pack routine complète est parfait. Mes rides sont moins visibles en moins de 3 semaines. Bluffant.", "author": "Isabelle D.", "city": "Nantes", "verified": true } },
+      { "type": "review", "settings": { "stars": 5, "text": "Service client impeccable et produits d'une efficacité remarquable. Ma peau n'a jamais été aussi belle.", "author": "Julie B.", "city": "Toulouse", "verified": true } }
+    ]
+  }]
+}
+{% endschema %}

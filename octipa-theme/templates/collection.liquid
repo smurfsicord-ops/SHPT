@@ -1,0 +1,38 @@
+<section class="section">
+  <div class="container">
+    <div class="section-header">
+      <h1 class="section-title">{{ collection.title }}</h1>
+      {%- if collection.description != blank -%}<p class="section-desc">{{ collection.description }}</p>{%- endif -%}
+      <div class="section-divider"></div>
+    </div>
+    <div class="products-grid">
+      {%- for product in collection.products -%}
+        <article class="product-card fade-up" style="transition-delay:{{ forloop.index0 | times: 80 }}ms">
+          <a href="{{ product.url }}" class="product-card-img-wrap" aria-label="{{ product.title | escape }}">
+            {%- if product.available == false -%}<span class="product-badge" style="background:var(--color-text-muted)">Épuisé</span>{%- endif -%}
+            {%- if product.compare_at_price > product.price and product.available -%}<span class="product-badge">Promo</span>{%- endif -%}
+            {%- if product.featured_image -%}
+              <img src="{{ product.featured_image | img_url: '600x800', crop: 'center' }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" width="600" height="800" loading="lazy">
+            {%- else -%}
+              <img src="{{ 'hero-secondary.jpg' | asset_url }}" alt="{{ product.title | escape }}" width="600" height="800" loading="lazy">
+            {%- endif -%}
+          </a>
+          <div class="product-card-body">
+            <p class="product-type">{{ product.type }}</p>
+            <h2 class="product-name"><a href="{{ product.url }}">{{ product.title }}</a></h2>
+            <div class="product-price-row">
+              <span class="product-price">{{ product.price | money }}</span>
+              {%- if product.compare_at_price > product.price -%}<span class="product-compare">{{ product.compare_at_price | money }}</span>{%- endif -%}
+            </div>
+            <a href="{{ product.url }}" class="btn btn--primary">Voir le produit</a>
+          </div>
+        </article>
+      {%- endfor -%}
+    </div>
+    {%- if paginate.pages > 1 -%}
+      <div style="text-align:center;margin-top:3rem">
+        {{ paginate | default_pagination }}
+      </div>
+    {%- endif -%}
+  </div>
+</section>

@@ -1,0 +1,56 @@
+<div class="features-bar">
+  <div class="container">
+    <div class="features-grid">
+      {%- for block in section.blocks -%}
+        <div class="feature-item fade-up" style="transition-delay:{{ forloop.index0 | times: 80 }}ms" {{ block.shopify_attributes }}>
+          <div class="feature-icon">
+            {%- case block.settings.icon -%}
+              {%- when 'truck' -%}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="1" y="3" width="15" height="13" rx="1"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+              {%- when 'leaf' -%}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M11 20A7 7 0 014 13c0-5 4-9 9-9 0 4-1 7-3 9M4 20l7-7"/></svg>
+              {%- when 'shield' -%}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+              {%- else -%}
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            {%- endcase -%}
+          </div>
+          <div>
+            <div class="feature-title">{{ block.settings.title }}</div>
+            <div class="feature-desc">{{ block.settings.desc }}</div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Barre avantages",
+  "max_blocks": 4,
+  "blocks": [{
+    "type": "feature",
+    "name": "Avantage",
+    "settings": [
+      { "type": "select", "id": "icon", "label": "Icône", "options": [
+        { "value": "truck", "label": "Livraison" },
+        { "value": "leaf", "label": "Naturel" },
+        { "value": "shield", "label": "Garantie" },
+        { "value": "refresh", "label": "Retours" }
+      ], "default": "truck" },
+      { "type": "text", "id": "title", "label": "Titre", "default": "Livraison offerte" },
+      { "type": "text", "id": "desc", "label": "Sous-titre", "default": "Dès 49€ d'achat" }
+    ]
+  }],
+  "presets": [{
+    "name": "Barre avantages",
+    "blocks": [
+      { "type": "feature", "settings": { "icon": "truck", "title": "Livraison offerte", "desc": "Dès 49€ d'achat" } },
+      { "type": "feature", "settings": { "icon": "leaf", "title": "100% Naturel", "desc": "Formules certifiées bio" } },
+      { "type": "feature", "settings": { "icon": "shield", "title": "Satisfait ou remboursé", "desc": "Garantie 30 jours" } },
+      { "type": "feature", "settings": { "icon": "refresh", "title": "Retours gratuits", "desc": "Échanges simplifiés" } }
+    ]
+  }]
+}
+{% endschema %}

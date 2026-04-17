@@ -3,7 +3,7 @@
   Description: Carte produit Octipa — image hover, badge flux, swatch tailles,
                quick add AJAX, wishlist localStorage
   Variables: product, show_vendor, show_rating
-  Usage: {% render 'card-product', product: product %}
+  Usage: {%- render 'card-product', product: product -%}
 {%- endcomment -%}
 
 {%- liquid
@@ -17,9 +17,8 @@
   if product.available
     assign sold_out = false
   endif
-  assign show_vendor  = show_vendor | default: false
-  assign show_rating  = show_rating | default: true
-  assign product_url  = product.url | within: collection
+  assign show_vendor = show_vendor | default: false
+  assign product_url = product.url | within: collection
 -%}
 
 <article
@@ -27,7 +26,6 @@
   data-product-id="{{ product.id }}"
   aria-label="{{ product.title | escape }}"
 >
-  {%- comment -%} IMAGE ZONE {%- endcomment -%}
   <div class="card-product__media" aria-hidden="true">
     <a href="{{ product_url }}" class="card-product__image-link" tabindex="-1">
       {%- if featured_image != blank -%}
@@ -57,7 +55,6 @@
       {%- endif -%}
     </a>
 
-    {%- comment -%} BADGES {%- endcomment -%}
     <div class="card-product__badges">
       {%- if on_sale -%}
         {%- assign savings = product.compare_at_price | minus: product.price -%}
@@ -65,17 +62,17 @@
         <span class="badge badge--sale">-{{ pct }}%</span>
       {%- endif -%}
       {%- if sold_out -%}
-        <span class="badge badge--sold-out">Epuise</span>
+        <span class="badge badge--sold-out">Épuisé</span>
       {%- endif -%}
       {%- if product.tags contains 'bestseller' -%}
-        <span class="badge badge--bestseller">Best-seller</span>
+        <span class="badge badge--bestseller">⭐ Best-seller</span>
       {%- endif -%}
     </div>
 
-    {%- comment -%} WISHLIST {%- endcomment -%}
     <button
       class="card-product__wishlist"
-      aria-label="Ajouter {{ product.title | escape }} a ma liste de souhaits"
+      aria-label="Ajouter {{ product.title | escape }} à ma liste de souhaits"
+      aria-pressed="false"
       data-wishlist-id="{{ product.id }}"
     >
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -84,27 +81,20 @@
     </button>
   </div>
 
-  {%- comment -%} INFOS PRODUIT {%- endcomment -%}
   <div class="card-product__info">
     {%- if show_vendor and product.vendor != blank -%}
       <p class="card-product__vendor">{{ product.vendor }}</p>
     {%- endif -%}
 
     <h3 class="card-product__title">
-      <a href="{{ product_url }}" class="card-product__title-link">
-        {{- product.title | escape -}}
-      </a>
+      <a href="{{ product_url }}" class="card-product__title-link">{{- product.title | escape -}}</a>
     </h3>
 
-    {%- comment -%} FLUX BADGE (metafield Octipa) {%- endcomment -%}
     {%- assign flux = product.metafields.custom.flux_level.value -%}
     {%- if flux != blank -%}
-      <span class="card-product__flux-badge flux-badge--{{ flux | downcase | replace: ' ', '-' }}">
-        {{- flux -}}
-      </span>
+      <span class="card-product__flux-badge flux-badge--{{ flux | downcase | replace: ' ', '-' }}">{{- flux -}}</span>
     {%- endif -%}
 
-    {%- comment -%} SWATCHES TAILLES {%- endcomment -%}
     {%- assign size_option = nil -%}
     {%- for option in product.options_with_values -%}
       {%- if option.name == 'Taille' or option.name == 'Size' -%}
@@ -112,7 +102,6 @@
         {%- break -%}
       {%- endif -%}
     {%- endfor -%}
-
     {%- if size_option != nil -%}
       <div class="card-product__swatches" aria-label="Tailles disponibles" role="group">
         {%- for value in size_option.values -%}
@@ -121,24 +110,15 @@
       </div>
     {%- endif -%}
 
-    {%- comment -%} PRIX {%- endcomment -%}
     <div class="card-product__price-wrapper">
       {%- if on_sale -%}
-        <s class="card-product__price--compare">
-          <span class="sr-only">Ancien prix :</span>
-          {{ product.compare_at_price | money }}
-        </s>
+        <s class="card-product__price--compare"><span class="sr-only">Ancien prix :</span>{{ product.compare_at_price | money }}</s>
       {%- endif -%}
-      <span class="card-product__price{% if on_sale %} card-product__price--sale{% endif %}">
-        {{ product.price | money }}
-      </span>
+      <span class="card-product__price{% if on_sale %} card-product__price--sale{% endif %}">{{ product.price | money }}</span>
     </div>
 
-    {%- comment -%} QUICK ADD {%- endcomment -%}
     {%- if sold_out -%}
-      <button class="card-product__atc btn btn--secondary" disabled>
-        Epuise
-      </button>
+      <button class="card-product__atc btn btn--secondary" disabled>Épuisé</button>
     {%- elsif product.variants.size == 1 -%}
       <button
         class="card-product__atc btn btn--primary"
@@ -148,260 +128,124 @@
       >
         <span class="card-product__atc-label">Ajouter au panier</span>
         <span class="card-product__atc-loading" aria-hidden="true">
-          <svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <svg class="spinner" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
             <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
             <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round"/>
           </svg>
         </span>
       </button>
     {%- else -%}
-      <a href="{{ product_url }}" class="card-product__atc btn btn--primary">
-        Voir les options
-      </a>
+      <a href="{{ product_url }}" class="card-product__atc btn btn--primary">Voir les options</a>
     {%- endif -%}
   </div>
 </article>
 
 {% stylesheet %}
 .card-product {
-  --card-radius: 12px;
   --img-ratio: 4 / 5;
   display: flex;
   flex-direction: column;
-  background: var(--color-surface, #fff);
-  border-radius: var(--card-radius);
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
-  transition: box-shadow 220ms ease, transform 220ms ease;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-interactive), transform var(--transition-interactive);
   position: relative;
 }
 .card-product:hover {
-  box-shadow: 0 4px 16px rgba(0,0,0,.10), 0 12px 32px rgba(0,0,0,.06);
-  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
 }
 .card-product__media {
   position: relative;
   aspect-ratio: var(--img-ratio);
   overflow: hidden;
-  background: #f3f0ec;
+  background: var(--color-surface-offset);
 }
-.card-product__image-link {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
+.card-product__image-link { display: block; width: 100%; height: 100%; }
 .card-product__img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100%; height: 100%; object-fit: cover; display: block;
   transition: opacity 350ms ease, transform 400ms ease;
 }
-.card-product__img--primary {
-  position: relative;
-  z-index: 1;
-}
-.card-product__img--secondary {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  opacity: 0;
-}
-.card-product__media:hover .card-product__img--secondary,
-.card-product__media:focus-within .card-product__img--secondary {
-  opacity: 1;
-}
-.card-product__media:hover .card-product__img--primary {
-  transform: scale(1.03);
-}
-.card-product__placeholder {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+.card-product__img--primary { position: relative; z-index: 1; }
+.card-product__img--secondary { position: absolute; inset: 0; z-index: 2; opacity: 0; }
+.card-product__media:hover .card-product__img--secondary { opacity: 1; }
+.card-product__media:hover .card-product__img--primary { transform: scale(1.04); }
+.card-product__placeholder { width: 100%; height: 100%; object-fit: cover; }
 .card-product__badges {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  z-index: 3;
+  position: absolute; top: 10px; left: 10px;
+  display: flex; flex-direction: column; gap: 5px; z-index: 3;
 }
 .badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 9px;
-  border-radius: 999px;
-  font-size: clamp(0.65rem, 0.6rem + 0.25vw, 0.75rem);
-  font-weight: 600;
-  line-height: 1.4;
-  letter-spacing: .02em;
+  display: inline-flex; align-items: center;
+  padding: 3px 10px; border-radius: var(--radius-full);
+  font-size: 0.7rem; font-weight: 700; letter-spacing: .03em;
 }
-.badge--sale { background: #e63946; color: #fff; }
+.badge--sale { background: var(--color-sale); color: #fff; }
 .badge--sold-out { background: #6b6b6b; color: #fff; }
 .badge--bestseller { background: #f4e8c1; color: #7a5e00; }
 .card-product__wishlist {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  z-index: 3;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: rgba(255,255,255,.85);
-  backdrop-filter: blur(6px);
-  border: none;
-  cursor: pointer;
-  color: #c0c0c0;
-  transition: color 200ms ease, background 200ms ease, transform 200ms ease;
+  position: absolute; top: 10px; right: 10px; z-index: 3;
+  display: flex; align-items: center; justify-content: center;
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(255,255,255,.85); backdrop-filter: blur(6px);
+  color: #ccc;
+  transition: color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
 }
-.card-product__wishlist:hover,
-.card-product__wishlist:focus-visible {
-  color: #e63946;
-  background: #fff;
-  transform: scale(1.1);
+.card-product__wishlist:hover, .card-product__wishlist:focus-visible {
+  color: var(--color-sale); background: #fff; transform: scale(1.1);
 }
-.card-product__wishlist.is-wished { color: #e63946; }
-.card-product__wishlist.is-wished svg { fill: #e63946; stroke: #e63946; }
+.card-product__wishlist.is-wished { color: var(--color-sale); }
+.card-product__wishlist.is-wished svg { fill: var(--color-sale); stroke: var(--color-sale); }
 .card-product__info {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  padding: 14px 16px 16px;
-  flex: 1;
+  display: flex; flex-direction: column; gap: var(--space-2);
+  padding: var(--space-3) var(--space-4) var(--space-4); flex: 1;
 }
 .card-product__vendor {
-  font-size: clamp(0.7rem, 0.65rem + 0.2vw, 0.75rem);
-  color: var(--color-text-muted, #7a7974);
-  text-transform: uppercase;
-  letter-spacing: .08em;
-  margin: 0;
+  font-size: var(--text-xs); color: var(--color-text-muted);
+  text-transform: uppercase; letter-spacing: .08em; margin: 0;
 }
-.card-product__title {
-  margin: 0;
-  font-size: clamp(0.9rem, 0.85rem + 0.25vw, 1.05rem);
-  font-weight: 600;
-  line-height: 1.35;
-}
-.card-product__title-link {
-  color: var(--color-text, #28251d);
-  text-decoration: none;
-}
-.card-product__title-link:hover {
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
+.card-product__title { margin: 0; font-size: var(--text-sm); font-weight: 600; font-family: var(--font-body); line-height: 1.35; }
+.card-product__title-link { color: var(--color-text); text-decoration: none; }
+.card-product__title-link:hover { color: var(--color-primary); }
 .card-product__flux-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.72rem;
-  font-weight: 600;
-  letter-spacing: .03em;
-  width: fit-content;
+  display: inline-flex; align-items: center; padding: 3px 10px;
+  border-radius: var(--radius-full); font-size: 0.7rem; font-weight: 600;
+  letter-spacing: .03em; width: fit-content;
 }
-.flux-badge--flux-modere { background: #dbeafe; color: #1e3a8a; }
-.flux-badge--flux-eleve { background: #fef3c7; color: #92400e; }
-.flux-badge--flux-tres-eleve { background: #fce7f3; color: #9d174d; }
-.card-product__swatches {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-}
+.flux-badge--flux-modéré    { background: #dbeafe; color: #1e3a8a; }
+.flux-badge--flux-élevé     { background: #fef3c7; color: #92400e; }
+.flux-badge--flux-très-élevé { background: #fce7f3; color: #9d174d; }
+.card-product__swatches { display: flex; flex-wrap: wrap; gap: 4px; }
 .swatch--size {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 32px;
-  height: 28px;
-  padding: 0 8px;
-  border-radius: 6px;
-  border: 1px solid rgba(0,0,0,.15);
-  font-size: 0.72rem;
-  font-weight: 500;
-  color: var(--color-text, #28251d);
-  background: var(--color-bg, #f7f6f2);
-  cursor: pointer;
-  transition: border-color 150ms ease, background 150ms ease;
+  display: inline-flex; align-items: center; justify-content: center;
+  min-width: 30px; height: 26px; padding: 0 7px;
+  border-radius: var(--radius-sm); border: 1px solid var(--color-border);
+  font-size: 0.7rem; font-weight: 500; color: var(--color-text);
+  background: var(--color-bg); cursor: default;
+  transition: border-color var(--transition-fast), background var(--transition-fast);
 }
-.swatch--size:hover {
-  border-color: var(--color-primary, #01696f);
-  background: #cedcd8;
-}
-.card-product__price-wrapper {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-.card-product__price {
-  font-size: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
-  font-weight: 700;
-  color: var(--color-text, #28251d);
-}
-.card-product__price--sale { color: #e63946; }
-.card-product__price--compare {
-  font-size: 0.85rem;
-  color: var(--color-text-muted, #7a7974);
-  text-decoration: line-through;
-}
+.swatch--size:hover { border-color: var(--color-primary); background: var(--color-primary-highlight); }
+.card-product__price-wrapper { display: flex; align-items: baseline; gap: var(--space-2); flex-wrap: wrap; }
+.card-product__price { font-size: var(--text-base); font-weight: 700; color: var(--color-text); }
+.card-product__price--sale { color: var(--color-sale); }
+.card-product__price--compare { font-size: var(--text-sm); color: var(--color-text-muted); text-decoration: line-through; }
 .card-product__atc {
-  margin-top: auto;
-  width: 100%;
-  padding: 11px 16px;
-  border-radius: 8px;
-  font-size: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
-  font-weight: 600;
-  cursor: pointer;
-  border: none;
-  transition: background 200ms ease, transform 120ms ease, opacity 200ms ease;
-  position: relative;
-  overflow: hidden;
+  margin-top: auto; width: 100%; padding: 11px 16px;
+  font-size: var(--text-sm); font-weight: 600; border-radius: var(--radius-md);
+  position: relative; overflow: hidden;
 }
-.btn--primary {
-  background: var(--color-primary, #01696f);
-  color: #fff;
-}
-.btn--primary:hover:not(:disabled) {
-  background: var(--color-primary-hover, #0c4e54);
-  transform: translateY(-1px);
-}
-.btn--primary:active:not(:disabled) { transform: translateY(0); }
-.btn--secondary {
-  background: var(--color-surface-offset, #f3f0ec);
-  color: var(--color-text-muted, #7a7974);
-}
-.btn:disabled { opacity: .55; cursor: not-allowed; }
 .card-product__atc[data-loading] .card-product__atc-label { opacity: 0; }
 .card-product__atc:not([data-loading]) .card-product__atc-loading { display: none; }
 .card-product__atc-loading {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  position: absolute; inset: 0; display: flex;
+  align-items: center; justify-content: center;
 }
 @keyframes spin { to { transform: rotate(360deg); } }
 .spinner { animation: spin .8s linear infinite; }
 .card-product--sold-out .card-product__media::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,.4);
-  z-index: 1;
-  pointer-events: none;
-}
-.sr-only {
-  position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
-}
-@media (min-width: 768px) {
-  .card-product__info { padding: 16px 20px 20px; gap: 10px; }
+  content: ''; position: absolute; inset: 0;
+  background: rgba(255,255,255,.35); z-index: 1; pointer-events: none;
 }
 {% endstylesheet %}
 
@@ -410,9 +254,7 @@ class QuickAddButton extends HTMLElement {
   constructor() {
     super();
     this._btn = this.querySelector('[data-quick-add]');
-    if (this._btn) {
-      this._btn.addEventListener('click', this._handleAdd.bind(this));
-    }
+    if (this._btn) this._btn.addEventListener('click', this._handleAdd.bind(this));
   }
   async _handleAdd(e) {
     e.preventDefault();
@@ -422,34 +264,29 @@ class QuickAddButton extends HTMLElement {
     btn.setAttribute('data-loading', '');
     btn.disabled = true;
     try {
-      const response = await fetch(window.Shopify.routes.root + 'cart/add.js', {
+      const res = await fetch(window.Shopify.routes.root + 'cart/add.js', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify({ id: variantId, quantity: 1 })
       });
-      if (!response.ok) throw new Error('Erreur ajout panier');
-      const item = await response.json();
+      if (!res.ok) throw new Error('Erreur');
+      const item = await res.json();
       document.dispatchEvent(new CustomEvent('cart:add', { detail: { item } }));
       btn.removeAttribute('data-loading');
       const label = btn.querySelector('.card-product__atc-label');
-      const originalText = label.textContent;
-      label.textContent = 'Ajoute !';
-      btn.style.background = '#437a22';
-      setTimeout(() => {
-        label.textContent = originalText;
-        btn.style.background = '';
-        btn.disabled = false;
-      }, 2000);
-    } catch (err) {
+      const original = label.textContent;
+      label.textContent = '✓ Ajouté !';
+      btn.style.background = 'var(--color-success)';
+      setTimeout(() => { label.textContent = original; btn.style.background = ''; btn.disabled = false; }, 2000);
+    } catch(err) {
       console.error('[QuickAdd]', err);
       btn.removeAttribute('data-loading');
       btn.disabled = false;
     }
   }
 }
-if (!customElements.get('quick-add-button')) {
-  customElements.define('quick-add-button', QuickAddButton);
-}
+if (!customElements.get('quick-add-button')) customElements.define('quick-add-button', QuickAddButton);
+
 class WishlistButton extends HTMLElement {
   connectedCallback() {
     this._btn = this.querySelector('[data-wishlist-id]');
@@ -458,30 +295,19 @@ class WishlistButton extends HTMLElement {
     this._update();
     this._btn.addEventListener('click', this._toggle.bind(this));
   }
-  _getList() {
-    try { return JSON.parse(localStorage.getItem('octipa_wishlist') || '[]'); }
-    catch { return []; }
-  }
-  _saveList(list) {
-    try { localStorage.setItem('octipa_wishlist', JSON.stringify(list)); } catch {}
-  }
+  _getList() { try { return JSON.parse(localStorage.getItem('octipa_wishlist') || '[]'); } catch { return []; } }
+  _saveList(l) { try { localStorage.setItem('octipa_wishlist', JSON.stringify(l)); } catch {} }
   _update() {
     const wished = this._getList().includes(this._id);
     this._btn.classList.toggle('is-wished', wished);
-    this._btn.setAttribute('aria-pressed', wished.toString());
+    this._btn.setAttribute('aria-pressed', String(wished));
   }
   _toggle() {
-    let list = this._getList();
-    if (list.includes(this._id)) {
-      list = list.filter(id => id !== this._id);
-    } else {
-      list.push(this._id);
-    }
-    this._saveList(list);
+    let l = this._getList();
+    l = l.includes(this._id) ? l.filter(id => id !== this._id) : [...l, this._id];
+    this._saveList(l);
     this._update();
   }
 }
-if (!customElements.get('wishlist-button')) {
-  customElements.define('wishlist-button', WishlistButton);
-}
+if (!customElements.get('wishlist-button')) customElements.define('wishlist-button', WishlistButton);
 {% endjavascript %}

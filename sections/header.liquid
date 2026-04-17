@@ -1,54 +1,596 @@
 {%- comment -%}
   Section: header
-  Description: En-tête sticky avec annonce bar, logo, nav, panier
-  Schema: announcement, logo_text, menu
+  Description: Header sticky Octipa — logo, nav desktop, icônes panier/compte,
+               navigation mobile hamburger, transparent-on-scroll
+  Schema: logo, menu, show_account, sticky
 {%- endcomment -%}
 
-<div class="announcement-bar">{{ section.settings.announcement }}</div>
+{%- liquid
+  assign main_menu  = section.settings.menu | default: 'main-menu'
+  assign logo       = section.settings.logo
+  assign logo_width = section.settings.logo_width | default: 140
+  assign sticky     = section.settings.sticky_header
+-%}
 
-<header id="SiteHeader" class="site-header">
-  <div class="header-inner">
-    <a href="{{ routes.root_url }}" class="header-logo" aria-label="{{ shop.name }}">
-      <svg width="28" height="28" viewBox="0 0 30 30" fill="none" aria-hidden="true">
-        <circle cx="15" cy="15" r="13" fill="#c4756a" opacity=".15"/>
-        <path d="M15 5 C10 5 7 10 7 15 C7 21 11 25 15 25 C19 25 23 21 23 15 C23 10 20 5 15 5Z" fill="#c4756a" opacity=".4"/>
-        <path d="M15 8 C12 8 10 12 10 15 C10 19 12 23 15 23 C18 23 20 19 20 15 C20 12 18 8 15 8Z" fill="#c4756a"/>
-      </svg>
-      {{ section.settings.logo_text }}
+<site-header
+  class="site-header{% if sticky %} site-header--sticky{% endif %}"
+  data-sticky="{{ sticky }}"
+>
+  <div class="site-header__inner container">
+
+    {%- comment -%} HAMBURGER MOBILE {%- endcomment -%}
+    <button
+      class="site-header__hamburger"
+      aria-label="Ouvrir le menu"
+      aria-expanded="false"
+      aria-controls="mobile-nav"
+      data-hamburger
+    >
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+      <span class="hamburger-line"></span>
+    </button>
+
+    {%- comment -%} LOGO {%- endcomment -%}
+    <a href="{{ routes.root_url }}" class="site-header__logo" aria-label="{{ shop.name }} — Accueil">
+      {%- if logo != blank -%}
+        <img
+          src="{{ logo | image_url: width: logo_width }}"
+          alt="{{ shop.name }}"
+          width="{{ logo_width }}"
+          height="{{ logo_width | divided_by: logo.aspect_ratio | round }}"
+          loading="eager"
+          decoding="async"
+        >
+      {%- else -%}
+        <span class="site-header__logo-text">{{ shop.name }}</span>
+      {%- endif -%}
     </a>
 
-    <nav class="header-nav" aria-label="Navigation principale">
-      {%- for link in linklists[section.settings.menu].links -%}
-        <a href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{{ link.title }}</a>
-      {%- endfor -%}
+    {%- comment -%} NAV DESKTOP {%- endcomment -%}
+    <nav class="site-header__nav" aria-label="Navigation principale">
+      <ul class="site-header__nav-list" role="list">
+        {%- for link in linklists[main_menu].links -%}
+          <li class="site-header__nav-item{% if link.links.size > 0 %} has-dropdown{% endif %}">
+            <a
+              href="{{ link.url }}"
+              class="site-header__nav-link{% if link.active %} is-active{% endif %}"
+              {%- if link.links.size > 0 -%} aria-haspopup="true" aria-expanded="false"{%- endif -%}
+            >
+              {{- link.title -}}
+              {%- if link.links.size > 0 -%}
+                <svg class="nav-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+                  <path d="M6 9l6 6 6-6"/>
+                </svg>
+              {%- endif -%}
+            </a>
+            {%- if link.links.size > 0 -%}
+              <ul class="site-header__dropdown" role="list">
+                {%- for child in link.links -%}
+                  <li>
+                    <a href="{{ child.url }}" class="site-header__dropdown-link">{{ child.title }}</a>
+                  </li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
     </nav>
 
-    <div class="header-actions">
-      <a href="{{ routes.account_url }}" class="header-icon-btn" aria-label="Mon compte">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-      </a>
-      <div class="cart-btn-wrap">
-        <button id="CartBtn" class="header-icon-btn" aria-label="Ouvrir le panier">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
-          {%- if cart.item_count > 0 -%}
-            <span class="cart-count" aria-label="{{ cart.item_count }} article(s) dans le panier">{{ cart.item_count }}</span>
-          {%- endif -%}
-        </button>
-      </div>
-      <button id="MobileMenuBtn" class="header-icon-btn mobile-menu-btn" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="MobileNav">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    {%- comment -%} ICÔNES DROITE {%- endcomment -%}
+    <div class="site-header__actions">
+
+      {%- comment -%} Recherche {%- endcomment -%}
+      <button class="site-header__icon-btn" aria-label="Rechercher" data-search-open>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <path d="M21 21l-4.35-4.35"/>
+        </svg>
       </button>
+
+      {%- comment -%} Compte {%- endcomment -%}
+      {%- if section.settings.show_account -%}
+        <a href="{{ routes.account_url }}" class="site-header__icon-btn" aria-label="Mon compte">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </a>
+      {%- endif -%}
+
+      {%- comment -%} Panier {%- endcomment -%}
+      <button class="site-header__icon-btn site-header__cart-btn" aria-label="Panier ({{ cart.item_count }} article{% if cart.item_count != 1 %}s{% endif %})" data-cart-open>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
+          <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+          <line x1="3" y1="6" x2="21" y2="6"/>
+          <path d="M16 10a4 4 0 0 1-8 0"/>
+        </svg>
+        {%- if cart.item_count > 0 -%}
+          <span class="cart-badge" aria-hidden="true">{{ cart.item_count }}</span>
+        {%- endif -%}
+      </button>
+
     </div>
   </div>
-</header>
+
+  {%- comment -%} NAV MOBILE {%- endcomment -%}
+  <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
+    <div class="mobile-nav__overlay" data-nav-close></div>
+    <nav class="mobile-nav__panel" aria-label="Navigation mobile">
+      <button class="mobile-nav__close" aria-label="Fermer le menu" data-nav-close>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path d="M18 6L6 18M6 6l12 12"/>
+        </svg>
+      </button>
+      <ul class="mobile-nav__list" role="list">
+        {%- for link in linklists[main_menu].links -%}
+          <li class="mobile-nav__item">
+            <a href="{{ link.url }}" class="mobile-nav__link{% if link.active %} is-active{% endif %}">
+              {{ link.title }}
+            </a>
+            {%- if link.links.size > 0 -%}
+              <ul class="mobile-nav__sub" role="list">
+                {%- for child in link.links -%}
+                  <li><a href="{{ child.url }}" class="mobile-nav__sub-link">{{ child.title }}</a></li>
+                {%- endfor -%}
+              </ul>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+      <div class="mobile-nav__footer">
+        <a href="{{ routes.account_url }}" class="btn btn--ghost" style="width:100%">Mon compte</a>
+      </div>
+    </nav>
+  </div>
+</site-header>
+
+{% stylesheet %}
+/* ============================================================
+   SITE HEADER — Octipa
+   ============================================================ */
+
+.site-header {
+  position: relative;
+  z-index: 100;
+  width: 100%;
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-divider);
+  transition: background var(--transition-slow), box-shadow var(--transition-slow);
+}
+
+.site-header--sticky {
+  position: sticky;
+  top: 0;
+}
+
+.site-header.is-scrolled {
+  box-shadow: var(--shadow-md);
+}
+
+.site-header.is-transparent {
+  background: transparent;
+  border-bottom-color: transparent;
+}
+
+.site-header.is-transparent .site-header__nav-link,
+.site-header.is-transparent .site-header__icon-btn,
+.site-header.is-transparent .site-header__logo-text {
+  color: #fff;
+}
+
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  height: var(--header-height);
+}
+
+/* --- LOGO --- */
+.site-header__logo {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+.site-header__logo-text {
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--color-primary);
+  letter-spacing: -.02em;
+  transition: color var(--transition-fast);
+}
+
+.site-header__logo:hover .site-header__logo-text {
+  color: var(--color-primary-hover);
+}
+
+/* --- NAV DESKTOP --- */
+.site-header__nav {
+  flex: 1;
+  display: none;
+}
+
+@media (min-width: 1024px) {
+  .site-header__nav { display: flex; justify-content: center; }
+}
+
+.site-header__nav-list {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  list-style: none;
+}
+
+.site-header__nav-item {
+  position: relative;
+}
+
+.site-header__nav-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.site-header__nav-link:hover,
+.site-header__nav-link.is-active {
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+}
+
+.nav-chevron {
+  transition: transform var(--transition-fast);
+}
+
+.has-dropdown:hover .nav-chevron,
+.has-dropdown:focus-within .nav-chevron {
+  transform: rotate(180deg);
+}
+
+/* Dropdown */
+.site-header__dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(8px);
+  min-width: 200px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: var(--space-2);
+  list-style: none;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity var(--transition-fast),
+    transform var(--transition-fast);
+  z-index: 10;
+}
+
+.has-dropdown:hover .site-header__dropdown,
+.has-dropdown:focus-within .site-header__dropdown {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.site-header__dropdown-link {
+  display: block;
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.site-header__dropdown-link:hover {
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+}
+
+/* --- ACTIONS (icônes droite) --- */
+.site-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  margin-left: auto;
+}
+
+.site-header__icon-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.site-header__icon-btn:hover {
+  background: var(--color-surface-offset);
+  color: var(--color-primary);
+}
+
+.cart-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: var(--radius-full);
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 17px;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* --- HAMBURGER --- */
+.site-header__hamburger {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  transition: background var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.site-header__hamburger:hover {
+  background: var(--color-surface-offset);
+}
+
+@media (min-width: 1024px) {
+  .site-header__hamburger { display: none; }
+}
+
+.hamburger-line {
+  display: block;
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  border-radius: 2px;
+  transform-origin: center;
+  transition: transform var(--transition-interactive), opacity var(--transition-fast);
+}
+
+.site-header__hamburger[aria-expanded="true"] .hamburger-line:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+.site-header__hamburger[aria-expanded="true"] .hamburger-line:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+.site-header__hamburger[aria-expanded="true"] .hamburger-line:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+/* --- MOBILE NAV --- */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+}
+
+.mobile-nav.is-open {
+  display: block;
+}
+
+.mobile-nav__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,.4);
+  backdrop-filter: blur(2px);
+  animation: fadeIn 250ms ease forwards;
+}
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.mobile-nav__panel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: min(320px, 90vw);
+  background: var(--color-surface);
+  padding: var(--space-6) var(--space-6) var(--space-8);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: slideIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  box-shadow: var(--shadow-lg);
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}
+
+.mobile-nav__close {
+  align-self: flex-end;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  margin-bottom: var(--space-6);
+  transition: background var(--transition-fast);
+}
+
+.mobile-nav__close:hover {
+  background: var(--color-surface-offset);
+}
+
+.mobile-nav__list {
+  flex: 1;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.mobile-nav__link {
+  display: block;
+  padding: var(--space-3) var(--space-2);
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  transition: background var(--transition-fast), color var(--transition-fast);
+}
+
+.mobile-nav__link:hover,
+.mobile-nav__link.is-active {
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+}
+
+.mobile-nav__sub {
+  list-style: none;
+  padding-left: var(--space-4);
+  margin-top: var(--space-1);
+}
+
+.mobile-nav__sub-link {
+  display: block;
+  padding: var(--space-2) var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-sm);
+  transition: color var(--transition-fast);
+}
+
+.mobile-nav__sub-link:hover { color: var(--color-primary); }
+
+.mobile-nav__footer {
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--color-divider);
+  margin-top: var(--space-6);
+}
+{% endstylesheet %}
+
+{% javascript %}
+/* ============================================================
+   SITE HEADER Web Component — Octipa
+   Sticky scroll + Mobile Nav
+   ============================================================ */
+
+class SiteHeader extends HTMLElement {
+  connectedCallback() {
+    this._sticky = this.dataset.sticky === 'true';
+    this._hamburger = this.querySelector('[data-hamburger]');
+    this._mobileNav = this.querySelector('.mobile-nav');
+    this._closeEls  = this.querySelectorAll('[data-nav-close]');
+
+    if (this._hamburger) {
+      this._hamburger.addEventListener('click', this._openNav.bind(this));
+    }
+    this._closeEls.forEach(el => el.addEventListener('click', this._closeNav.bind(this)));
+
+    if (this._sticky) {
+      this._initScroll();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') this._closeNav();
+    });
+  }
+
+  _initScroll() {
+    const onScroll = () => {
+      const scrolled = window.scrollY > 10;
+      this.classList.toggle('is-scrolled', scrolled);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  _openNav() {
+    this._mobileNav.classList.add('is-open');
+    this._mobileNav.setAttribute('aria-hidden', 'false');
+    this._hamburger.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+
+    // Focus trap — premier lien
+    const firstLink = this._mobileNav.querySelector('a, button');
+    if (firstLink) firstLink.focus();
+  }
+
+  _closeNav() {
+    this._mobileNav.classList.remove('is-open');
+    this._mobileNav.setAttribute('aria-hidden', 'true');
+    if (this._hamburger) {
+      this._hamburger.setAttribute('aria-expanded', 'false');
+      this._hamburger.focus();
+    }
+    document.body.style.overflow = '';
+  }
+}
+
+if (!customElements.get('site-header')) {
+  customElements.define('site-header', SiteHeader);
+}
+{% endjavascript %}
 
 {% schema %}
 {
-  "name": "En-tête",
+  "name": "Header",
   "settings": [
-    { "type": "text", "id": "announcement", "label": "Texte bandeau", "default": "📦 Livraison offerte dès 49€ — Emballage discret garanti" },
-    { "type": "text", "id": "logo_text",    "label": "Nom de la marque", "default": "Octipa" },
-    { "type": "link_list", "id": "menu",   "label": "Menu principal",  "default": "main-menu" }
+    {
+      "type": "image_picker",
+      "id": "logo",
+      "label": "Logo"
+    },
+    {
+      "type": "range",
+      "id": "logo_width",
+      "min": 80,
+      "max": 300,
+      "step": 10,
+      "default": 140,
+      "unit": "px",
+      "label": "Largeur du logo"
+    },
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Menu principal",
+      "default": "main-menu"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_account",
+      "label": "Afficher le lien Mon compte",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "sticky_header",
+      "label": "Header sticky (fixe au scroll)",
+      "default": true
+    }
   ]
 }
 {% endschema %}

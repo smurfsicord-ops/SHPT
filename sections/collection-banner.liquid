@@ -1,48 +1,102 @@
 {%- comment -%}
   Section: collection-banner
-  Description: Bandeau en-tête de collection — image + titre + description
+  Description: Bandeau catalogue — texte, couleurs, fond, image
+                tout est modifiable depuis l'éditeur de thème Shopify
 {%- endcomment -%}
 
 {%- liquid
-  assign show_image       = section.settings.show_image
-  assign banner_height    = section.settings.banner_height | default: 'medium'
-  assign overlay_opacity  = section.settings.overlay_opacity | default: 40
+  assign custom_title      = section.settings.custom_title
+  assign custom_subtitle   = section.settings.custom_subtitle
+  assign show_breadcrumb   = section.settings.show_breadcrumb
+  assign show_count        = section.settings.show_count
+  assign show_image        = section.settings.show_image
+  assign custom_image      = section.settings.custom_image
+  assign banner_height     = section.settings.banner_height     | default: 'medium'
+  assign overlay_opacity   = section.settings.overlay_opacity   | default: 40
+  assign text_align        = section.settings.text_align        | default: 'left'
+  assign bg_color          = section.settings.bg_color
+  assign title_color       = section.settings.title_color
+  assign subtitle_color    = section.settings.subtitle_color
+  assign eyebrow_text      = section.settings.eyebrow_text
+  assign eyebrow_color     = section.settings.eyebrow_color
+
+  assign display_title = custom_title | default: collection.title
+  assign has_image     = false
+  if custom_image != blank
+    assign has_image = true
+  elsif collection.image != blank and show_image
+    assign has_image = true
+  endif
 -%}
 
-<div class="coll-banner coll-banner--{{ banner_height }}{% if collection.image == blank or show_image == false %} coll-banner--no-image{% endif %}">
-  {%- if collection.image != blank and show_image -%}
+<div
+  class="coll-banner coll-banner--{{ banner_height }} coll-banner--align-{{ text_align }}{% unless has_image %} coll-banner--no-image{% endunless %}"
+  style="
+    {%- if bg_color != blank and bg_color != 'rgba(0,0,0,0)' -%}--banner-bg: {{ bg_color }};{%- endif -%}
+    {%- if title_color != blank and title_color != 'rgba(0,0,0,0)' -%}--banner-title-color: {{ title_color }};{%- endif -%}
+    {%- if subtitle_color != blank and subtitle_color != 'rgba(0,0,0,0)' -%}--banner-subtitle-color: {{ subtitle_color }};{%- endif -%}
+    {%- if eyebrow_color != blank and eyebrow_color != 'rgba(0,0,0,0)' -%}--banner-eyebrow-color: {{ eyebrow_color }};{%- endif -%}
+  "
+>
+
+  {%- comment -%} IMAGE DE FOND {%- endcomment -%}
+  {%- if has_image -%}
     <div class="coll-banner__bg" aria-hidden="true">
-      <img
-        src="{{ collection.image | image_url: width: 1400 }}"
-        alt="{{ collection.title | escape }}"
-        width="1400"
-        height="400"
-        loading="eager"
-        decoding="async"
-      >
+      {%- if custom_image != blank -%}
+        <img
+          src="{{ custom_image | image_url: width: 1600 }}"
+          alt="{{ display_title | escape }}"
+          width="1600" height="500"
+          loading="eager" decoding="async"
+        >
+      {%- else -%}
+        <img
+          src="{{ collection.image | image_url: width: 1600 }}"
+          alt="{{ collection.title | escape }}"
+          width="1600" height="500"
+          loading="eager" decoding="async"
+        >
+      {%- endif -%}
       <div class="coll-banner__overlay" style="--opacity: {{ overlay_opacity | divided_by: 100.0 }}"></div>
     </div>
   {%- endif -%}
 
   <div class="coll-banner__content">
-    <nav class="coll-banner__breadcrumb" aria-label="Fil d'Ariane">
-      <ol role="list">
-        <li><a href="/">Accueil</a></li>
-        <li aria-hidden="true">›</li>
-        <li aria-current="page">{{ collection.title }}</li>
-      </ol>
-    </nav>
-    <h1 class="coll-banner__title">{{ collection.title }}</h1>
-    {%- if collection.description != blank -%}
+
+    {%- if show_breadcrumb -%}
+      <nav class="coll-banner__breadcrumb" aria-label="Fil d'Ariane">
+        <ol role="list">
+          <li><a href="/">Accueil</a></li>
+          <li aria-hidden="true">›</li>
+          <li aria-current="page">{{ display_title }}</li>
+        </ol>
+      </nav>
+    {%- endif -%}
+
+    {%- if eyebrow_text != blank -%}
+      <p class="coll-banner__eyebrow">{{ eyebrow_text }}</p>
+    {%- endif -%}
+
+    <h1 class="coll-banner__title">{{ display_title }}</h1>
+
+    {%- if custom_subtitle != blank -%}
+      <p class="coll-banner__desc">{{ custom_subtitle }}</p>
+    {%- elsif collection.description != blank -%}
       <p class="coll-banner__desc">{{ collection.description }}</p>
     {%- endif -%}
-    <p class="coll-banner__count">{{ collection.products_count }} produit{% if collection.products_count > 1 %}s{% endif %}</p>
+
+    {%- if show_count -%}
+      <p class="coll-banner__count">
+        {{ collection.products_count }} produit{% if collection.products_count > 1 %}s{% endif %}
+      </p>
+    {%- endif -%}
+
   </div>
 </div>
 
 {% stylesheet %}
 /* ============================================================
-   COLLECTION BANNER — Octipa
+   COLLECTION BANNER — Octipa (fully customisable)
    ============================================================ */
 
 .coll-banner {
@@ -50,33 +104,37 @@
   display: flex;
   align-items: flex-end;
   overflow: hidden;
-  background: var(--color-surface-offset, #f3f0ec);
+  background: var(--banner-bg, var(--color-surface-offset, #f3f0ec));
 }
 
-.coll-banner--small  { min-height: 180px; }
+.coll-banner--small  { min-height: 160px; }
 .coll-banner--medium { min-height: 260px; }
-.coll-banner--large  { min-height: 360px; }
-.coll-banner--no-image { min-height: 140px; align-items: center; }
+.coll-banner--large  { min-height: 380px; }
+.coll-banner--no-image { align-items: center; min-height: 130px; }
 
+/* Alignement */
+.coll-banner--align-left   .coll-banner__content { text-align: left; }
+.coll-banner--align-center .coll-banner__content { text-align: center; }
+.coll-banner--align-right  .coll-banner__content { text-align: right; }
+.coll-banner--align-center .coll-banner__breadcrumb ol { justify-content: center; }
+.coll-banner--align-right  .coll-banner__breadcrumb ol { justify-content: flex-end; }
+
+/* IMAGE */
 .coll-banner__bg {
   position: absolute;
   inset: 0;
   z-index: 0;
 }
-
 .coll-banner__bg img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
 }
-
 .coll-banner__overlay {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background: rgba(0,0,0,var(--opacity, 0.4));
 }
 
+/* CONTENU */
 .coll-banner__content {
   position: relative;
   z-index: 1;
@@ -86,10 +144,7 @@
   padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem);
 }
 
-.coll-banner--no-image .coll-banner__content {
-  text-align: center;
-}
-
+/* BREADCRUMB */
 .coll-banner__breadcrumb ol {
   display: flex;
   flex-wrap: wrap;
@@ -97,63 +152,73 @@
   gap: 6px;
   list-style: none;
   padding: 0;
-  margin: 0 0 12px;
-  font-size: 0.8rem;
+  margin: 0 0 10px;
+  font-size: 0.78rem;
 }
-
 .coll-banner__breadcrumb a {
   color: var(--color-text-muted, #7a7974);
   text-decoration: none;
 }
-
+.coll-banner--medium .coll-banner__breadcrumb a,
+.coll-banner--large  .coll-banner__breadcrumb a {
+  color: rgba(255,255,255,.65);
+}
 .coll-banner__breadcrumb a:hover { text-decoration: underline; }
 
-.coll-banner--no-image .coll-banner__breadcrumb { justify-content: center; }
+/* EYEBROW */
+.coll-banner__eyebrow {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+  color: var(--banner-eyebrow-color, var(--color-primary, #c4756a));
+  margin-bottom: .5rem;
+}
 
+/* TITRE */
 .coll-banner__title {
   font-family: var(--font-display, Georgia, serif);
   font-size: clamp(1.6rem, 1rem + 2.5vw, 2.8rem);
   font-weight: 700;
   line-height: 1.15;
   margin: 0 0 10px;
-  color: var(--color-text, #28251d);
+  color: var(--banner-title-color, var(--color-text, #28251d));
 }
-
 .coll-banner--medium .coll-banner__title,
-.coll-banner--large .coll-banner__title {
-  color: #fff;
-  text-shadow: 0 2px 12px rgba(0,0,0,.3);
+.coll-banner--large  .coll-banner__title {
+  color: var(--banner-title-color, #fff);
+  text-shadow: 0 2px 12px rgba(0,0,0,.25);
 }
 
+/* SOUS-TITRE */
 .coll-banner__desc {
   font-size: clamp(0.9rem, 0.85rem + 0.2vw, 1rem);
-  color: var(--color-text-muted, #7a7974);
+  color: var(--banner-subtitle-color, var(--color-text-muted, #7a7974));
   max-width: 55ch;
   margin: 0 0 10px;
-  line-height: 1.6;
+  line-height: 1.65;
 }
-
 .coll-banner--medium .coll-banner__desc,
-.coll-banner--large .coll-banner__desc {
-  color: rgba(255,255,255,.85);
+.coll-banner--large  .coll-banner__desc {
+  color: var(--banner-subtitle-color, rgba(255,255,255,.82));
 }
 
+/* COMPTEUR */
 .coll-banner__count {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   font-weight: 600;
-  letter-spacing: .06em;
+  letter-spacing: .07em;
   text-transform: uppercase;
   color: var(--color-primary, #c4756a);
   margin: 0;
 }
-
 .coll-banner--medium .coll-banner__count,
-.coll-banner--large .coll-banner__count {
-  color: rgba(255,255,255,.7);
+.coll-banner--large  .coll-banner__count {
+  color: rgba(255,255,255,.6);
 }
 
 @media (min-width: 768px) {
-  .coll-banner--small  { min-height: 220px; }
+  .coll-banner--small  { min-height: 200px; }
   .coll-banner--medium { min-height: 320px; }
   .coll-banner--large  { min-height: 460px; }
 }
@@ -161,39 +226,123 @@
 
 {% schema %}
 {
-  "name": "Bandeau collection",
+  "name": "Bandeau catalogue",
   "tag": "div",
   "settings": [
     {
+      "type": "header",
+      "content": "Texte"
+    },
+    {
+      "type": "text",
+      "id": "custom_title",
+      "label": "Titre personnalisé",
+      "info": "Laissez vide pour utiliser le nom de la collection automatiquement."
+    },
+    {
+      "type": "text",
+      "id": "eyebrow_text",
+      "label": "Texte au-dessus du titre (eyebrow)",
+      "placeholder": "ex : Nos produits"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_subtitle",
+      "label": "Sous-titre personnalisé",
+      "info": "Laissez vide pour utiliser la description de la collection."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_breadcrumb",
+      "label": "Afficher le fil d'Ariane",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_count",
+      "label": "Afficher le nombre de produits",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Couleurs"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Couleur de fond (sans image)",
+      "default": "#f3f0ec"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Couleur du titre"
+    },
+    {
+      "type": "color",
+      "id": "subtitle_color",
+      "label": "Couleur du sous-titre"
+    },
+    {
+      "type": "color",
+      "id": "eyebrow_color",
+      "label": "Couleur du texte eyebrow"
+    },
+    {
+      "type": "header",
+      "content": "Image de fond"
+    },
+    {
+      "type": "image_picker",
+      "id": "custom_image",
+      "label": "Image personnalisée",
+      "info": "Remplace l'image de la collection. Recommandé : 1600×500px."
+    },
+    {
       "type": "checkbox",
       "id": "show_image",
-      "label": "Afficher l'image de la collection",
+      "label": "Utiliser l'image de la collection (si pas d'image ci-dessus)",
       "default": true
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacité du filtre sombre sur l'image",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Mise en page"
     },
     {
       "type": "select",
       "id": "banner_height",
       "label": "Hauteur du bandeau",
       "options": [
-        { "value": "small",  "label": "Petit" },
-        { "value": "medium", "label": "Moyen" },
-        { "value": "large",  "label": "Grand" }
+        { "value": "small",  "label": "Petit (160px)" },
+        { "value": "medium", "label": "Moyen (260px)" },
+        { "value": "large",  "label": "Grand (380px)" }
       ],
       "default": "medium"
     },
     {
-      "type": "range",
-      "id": "overlay_opacity",
-      "label": "Opacité du filtre sombre",
-      "min": 0,
-      "max": 80,
-      "step": 5,
-      "unit": "%",
-      "default": 40
+      "type": "select",
+      "id": "text_align",
+      "label": "Alignement du texte",
+      "options": [
+        { "value": "left",   "label": "Gauche" },
+        { "value": "center", "label": "Centre" },
+        { "value": "right",  "label": "Droite" }
+      ],
+      "default": "left"
     }
   ],
   "presets": [
-    { "name": "Bandeau collection" }
+    { "name": "Bandeau catalogue" }
   ]
 }
 {% endschema %}

@@ -1,0 +1,718 @@
+{%- comment -%}
+  Section: collection-main
+  Description: Grille produits Octipa — filtres, tri, compteur, pagination
+  Shopify 2.0 — supporte blocks, modifiable dans l'éditeur de thème
+{%- endcomment -%}
+
+{%- liquid
+  assign products_per_page  = section.settings.products_per_page  | default: 12
+  assign columns_desktop    = section.settings.columns_desktop     | default: 3
+  assign show_filters       = section.settings.show_filters
+  assign show_sort          = section.settings.show_sort
+  assign show_product_count = section.settings.show_product_count
+-%}
+
+{%- paginate collection.products by products_per_page -%}
+
+<section class="coll-main" id="CollectionMain">
+  <div class="container">
+
+    {%- comment -%} BARRE TRI + FILTRE {%- endcomment -%}
+    {%- if show_sort or show_filters -%}
+    <div class="coll-toolbar">
+      <div class="coll-toolbar__left">
+        {%- if show_product_count -%}
+          <p class="coll-count">
+            {%- if collection.products_count == 1 -%}
+              1 produit
+            {%- else -%}
+              {{ collection.products_count }} produits
+            {%- endif -%}
+          </p>
+        {%- endif -%}
+        {%- if show_filters -%}
+          <button class="coll-filter-toggle" aria-expanded="false" aria-controls="CollFilters" data-filter-toggle>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><line x1="4" y1="6" x2="11" y2="6"/><line x1="16" y1="6" x2="20" y2="6"/><circle cx="13.5" cy="6" r="2.5"/><line x1="4" y1="12" x2="8" y2="12"/><line x1="13" y1="12" x2="20" y2="12"/><circle cx="10.5" cy="12" r="2.5"/><line x1="4" y1="18" x2="15" y2="18"/><line x1="20" y1="18" x2="20" y2="18"/><circle cx="17.5" cy="18" r="2.5"/></svg>
+            Filtrer
+          </button>
+        {%- endif -%}
+      </div>
+
+      {%- if show_sort -%}
+      <div class="coll-toolbar__right">
+        <label for="CollSort" class="sr-only">Trier par</label>
+        <div class="coll-sort-wrap">
+          <select id="CollSort" class="coll-sort-select" data-sort-select>
+            <option value="manual"{% if collection.sort_by == 'manual' %} selected{% endif %}>En vedette</option>
+            <option value="best-selling"{% if collection.sort_by == 'best-selling' %} selected{% endif %}>Meilleures ventes</option>
+            <option value="title-ascending"{% if collection.sort_by == 'title-ascending' %} selected{% endif %}>A – Z</option>
+            <option value="title-descending"{% if collection.sort_by == 'title-descending' %} selected{% endif %}>Z – A</option>
+            <option value="price-ascending"{% if collection.sort_by == 'price-ascending' %} selected{% endif %}>Prix croissant</option>
+            <option value="price-descending"{% if collection.sort_by == 'price-descending' %} selected{% endif %}>Prix décroissant</option>
+            <option value="created-descending"{% if collection.sort_by == 'created-descending' %} selected{% endif %}>Nouveautés</option>
+          </select>
+          <svg class="coll-sort-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+        </div>
+      </div>
+      {%- endif -%}
+    </div>
+    {%- endif -%}
+
+    <div class="coll-layout" id="CollLayout">
+
+      {%- comment -%} PANNEAU FILTRES {%- endcomment -%}
+      {%- if show_filters -%}
+      <aside class="coll-filters" id="CollFilters" aria-hidden="true">
+        <div class="coll-filters__header">
+          <span class="coll-filters__title">Filtres</span>
+          <button class="coll-filters__close" aria-label="Fermer les filtres" data-filter-close>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
+          </button>
+        </div>
+
+        {%- for filter in collection.filters -%}
+          <div class="coll-filter-group" data-filter-group>
+            <button class="coll-filter-group__toggle" aria-expanded="true" data-filter-group-toggle>
+              {{ filter.label }}
+              <svg class="coll-filter-chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="coll-filter-group__body">
+              {%- case filter.type -%}
+
+              {%- when 'boolean' or 'list' -%}
+                <ul class="coll-filter-list" role="list">
+                  {%- for filter_value in filter.values -%}
+                    <li>
+                      <label class="coll-filter-check">
+                        <input
+                          type="checkbox"
+                          name="{{ filter_value.param_name }}"
+                          value="{{ filter_value.value }}"
+                          {% if filter_value.active %}checked{% endif %}
+                          data-filter-input
+                        >
+                        <span class="coll-filter-check__label">
+                          {{- filter_value.label -}}
+                          <span class="coll-filter-check__count">({{ filter_value.count }})</span>
+                        </span>
+                      </label>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+
+              {%- when 'price_range' -%}
+                {%- assign min_price = filter.min_value.value | default: 0 -%}
+                {%- assign max_price = filter.max_value.value | default: filter.range_max -%}
+                <div class="coll-filter-price">
+                  <div class="coll-filter-price__inputs">
+                    <div class="coll-filter-price__field">
+                      <label for="FilterPriceMin">Min</label>
+                      <div class="coll-filter-price__input-wrap">
+                        <span>{{ cart.currency.symbol }}</span>
+                        <input
+                          type="number"
+                          id="FilterPriceMin"
+                          name="{{ filter.min_value.param_name }}"
+                          value="{{ min_price | money_without_currency | remove: ' ' }}"
+                          min="0"
+                          max="{{ filter.range_max | money_without_currency | remove: ' ' }}"
+                          data-filter-input
+                        >
+                      </div>
+                    </div>
+                    <span class="coll-filter-price__sep">–</span>
+                    <div class="coll-filter-price__field">
+                      <label for="FilterPriceMax">Max</label>
+                      <div class="coll-filter-price__input-wrap">
+                        <span>{{ cart.currency.symbol }}</span>
+                        <input
+                          type="number"
+                          id="FilterPriceMax"
+                          name="{{ filter.max_value.param_name }}"
+                          value="{{ max_price | money_without_currency | remove: ' ' }}"
+                          min="0"
+                          max="{{ filter.range_max | money_without_currency | remove: ' ' }}"
+                          data-filter-input
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+              {%- endcase -%}
+            </div>
+          </div>
+        {%- endfor -%}
+
+        {%- if collection.filters.size > 0 -%}
+          <a href="{{ collection.url }}" class="coll-filters__clear">Effacer les filtres</a>
+        {%- endif -%}
+      </aside>
+      {%- endif -%}
+
+      {%- comment -%} GRILLE PRODUITS {%- endcomment -%}
+      <div class="coll-grid-wrap">
+        {%- if collection.products.size == 0 -%}
+          <div class="coll-empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <p>Aucun produit ne correspond à votre recherche.</p>
+            <a href="{{ collection.url }}" class="btn btn--primary">Voir tous les produits</a>
+          </div>
+        {%- else -%}
+          <ul
+            class="coll-grid coll-grid--{{ columns_desktop }}"
+            id="CollGrid"
+            role="list"
+          >
+            {%- for product in collection.products -%}
+              <li class="coll-grid__item">
+                {%- render 'card-product', product: product -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+        {%- endif -%}
+
+        {%- comment -%} PAGINATION {%- endcomment -%}
+        {%- if paginate.pages > 1 -%}
+          <nav class="coll-pagination" aria-label="Pagination">
+            {%- if paginate.previous -%}
+              <a href="{{ paginate.previous.url }}" class="coll-pagination__btn" aria-label="Page précédente">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 18l-6-6 6-6"/></svg>
+              </a>
+            {%- endif -%}
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}
+                <a href="{{ part.url }}" class="coll-pagination__num">{{ part.title }}</a>
+              {%- elsif part.title == paginate.current_page -%}
+                <span class="coll-pagination__num coll-pagination__num--active" aria-current="page">{{ part.title }}</span>
+              {%- else -%}
+                <span class="coll-pagination__ellipsis">&hellip;</span>
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if paginate.next -%}
+              <a href="{{ paginate.next.url }}" class="coll-pagination__btn" aria-label="Page suivante">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+              </a>
+            {%- endif -%}
+          </nav>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</section>
+
+{%- endpaginate -%}
+
+{% stylesheet %}
+/* ============================================================
+   COLLECTION MAIN — Octipa
+   ============================================================ */
+
+.coll-main {
+  padding-block: clamp(1.5rem, 3vw, 3rem);
+  background: var(--color-bg, #f7f6f2);
+}
+
+/* TOOLBAR */
+.coll-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--color-divider, #dcd9d5);
+  margin-bottom: 1.5rem;
+}
+
+.coll-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.coll-count {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #7a7974);
+  margin: 0;
+}
+
+.coll-filter-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  border: 1.5px solid var(--color-border, #d4d1ca);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text, #28251d);
+  background: #fff;
+  cursor: pointer;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.coll-filter-toggle:hover,
+.coll-filter-toggle[aria-expanded="true"] {
+  border-color: var(--color-primary, #01696f);
+  color: var(--color-primary, #01696f);
+  background: var(--color-primary-highlight, #cedcd8);
+}
+
+/* SORT */
+.coll-sort-wrap {
+  position: relative;
+}
+
+.coll-sort-select {
+  appearance: none;
+  padding: 8px 36px 8px 12px;
+  border: 1.5px solid var(--color-border, #d4d1ca);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-text, #28251d);
+  background: #fff;
+  cursor: pointer;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 150ms ease;
+}
+
+.coll-sort-select:focus {
+  border-color: var(--color-primary, #01696f);
+  box-shadow: 0 0 0 3px rgba(1,105,111,.1);
+}
+
+.coll-sort-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #7a7974;
+}
+
+/* LAYOUT */
+.coll-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 2rem;
+  align-items: start;
+}
+
+@media (min-width: 900px) {
+  .coll-layout.filters-open {
+    grid-template-columns: 240px 1fr;
+  }
+}
+
+/* FILTERS PANEL */
+.coll-filters {
+  display: none;
+  background: #fff;
+  border-radius: 14px;
+  padding: 1.25rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
+  position: sticky;
+  top: calc(var(--header-height, 64px) + 16px);
+}
+
+.coll-filters.is-open {
+  display: block;
+}
+
+@media (max-width: 899px) {
+  .coll-filters.is-open {
+    position: fixed;
+    inset: 0;
+    z-index: 300;
+    border-radius: 0;
+    overflow-y: auto;
+    padding: 1.5rem;
+  }
+}
+
+.coll-filters__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.25rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--color-divider, #dcd9d5);
+}
+
+.coll-filters__title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--color-text, #28251d);
+}
+
+.coll-filters__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: var(--color-surface-offset, #f3f0ec);
+  color: var(--color-text, #28251d);
+  cursor: pointer;
+  border: none;
+  transition: background 150ms ease;
+}
+
+.coll-filters__close:hover { background: #e8e4de; }
+
+.coll-filter-group {
+  border-bottom: 1px solid var(--color-divider, #dcd9d5);
+  padding-bottom: 1rem;
+  margin-bottom: 1rem;
+}
+
+.coll-filter-group__toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--color-text, #28251d);
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0 0 .75rem;
+  letter-spacing: .01em;
+}
+
+.coll-filter-chevron {
+  transition: transform 200ms ease;
+}
+
+.coll-filter-group__toggle[aria-expanded="false"] .coll-filter-chevron {
+  transform: rotate(-90deg);
+}
+
+.coll-filter-group__body {
+  overflow: hidden;
+}
+
+.coll-filter-group__toggle[aria-expanded="false"] + .coll-filter-group__body {
+  display: none;
+}
+
+.coll-filter-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.coll-filter-check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: var(--color-text, #28251d);
+}
+
+.coll-filter-check input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary, #01696f);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.coll-filter-check__count {
+  color: var(--color-text-muted, #7a7974);
+  font-size: 0.78rem;
+  margin-left: 3px;
+}
+
+/* PRICE FILTER */
+.coll-filter-price__inputs {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.coll-filter-price__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex: 1;
+}
+
+.coll-filter-price__field label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--color-text-muted, #7a7974);
+  text-transform: uppercase;
+  letter-spacing: .06em;
+}
+
+.coll-filter-price__input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--color-bg, #f7f6f2);
+  border: 1.5px solid var(--color-border, #d4d1ca);
+  border-radius: 8px;
+  padding: 7px 10px;
+  font-size: 0.85rem;
+}
+
+.coll-filter-price__input-wrap span {
+  color: var(--color-text-muted, #7a7974);
+}
+
+.coll-filter-price__input-wrap input {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 0.85rem;
+  font-family: inherit;
+  color: var(--color-text, #28251d);
+}
+
+.coll-filter-price__sep {
+  color: var(--color-text-muted, #7a7974);
+  font-size: 0.9rem;
+  margin-top: 1.2rem;
+}
+
+.coll-filters__clear {
+  display: block;
+  text-align: center;
+  margin-top: .5rem;
+  font-size: 0.82rem;
+  color: var(--color-text-muted, #7a7974);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.coll-filters__clear:hover {
+  color: var(--color-error, #a12c7b);
+}
+
+/* GRID */
+.coll-grid {
+  display: grid;
+  list-style: none;
+  gap: clamp(1rem, 2vw, 1.5rem);
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 768px) {
+  .coll-grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .coll-grid--4 { grid-template-columns: repeat(4, 1fr); }
+  .coll-grid--2 { grid-template-columns: repeat(2, 1fr); }
+}
+
+/* EMPTY */
+.coll-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 16px;
+  padding: 60px 20px;
+  color: var(--color-text-muted, #7a7974);
+}
+
+.coll-empty p {
+  font-size: 1rem;
+  max-width: 30ch;
+  margin: 0;
+}
+
+/* PAGINATION */
+.coll-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 3rem;
+  flex-wrap: wrap;
+}
+
+.coll-pagination__btn,
+.coll-pagination__num {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 38px;
+  height: 38px;
+  padding: 0 10px;
+  border-radius: 8px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--color-text, #28251d);
+  background: #fff;
+  border: 1.5px solid var(--color-border, #d4d1ca);
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease, color 150ms ease;
+}
+
+.coll-pagination__btn:hover,
+.coll-pagination__num:hover {
+  border-color: var(--color-primary, #01696f);
+  color: var(--color-primary, #01696f);
+}
+
+.coll-pagination__num--active {
+  background: var(--color-primary, #01696f);
+  border-color: var(--color-primary, #01696f);
+  color: #fff;
+  cursor: default;
+}
+
+.coll-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px;
+  color: var(--color-text-muted, #7a7974);
+}
+{% endstylesheet %}
+
+{% javascript %}
+/* ============================================================
+   COLLECTION MAIN — Filtres + Tri
+   ============================================================ */
+(function() {
+  const layout     = document.getElementById('CollLayout');
+  const filterPanel = document.getElementById('CollFilters');
+  const filterToggle = document.querySelector('[data-filter-toggle]');
+  const filterClose  = document.querySelector('[data-filter-close]');
+  const sortSelect   = document.querySelector('[data-sort-select]');
+
+  /* --- TOGGLE FILTRES --- */
+  if (filterToggle && filterPanel) {
+    filterToggle.addEventListener('click', () => {
+      const isOpen = filterPanel.classList.toggle('is-open');
+      filterToggle.setAttribute('aria-expanded', isOpen);
+      filterPanel.setAttribute('aria-hidden', !isOpen);
+      if (layout) layout.classList.toggle('filters-open', isOpen);
+    });
+  }
+
+  if (filterClose) {
+    filterClose.addEventListener('click', () => {
+      filterPanel.classList.remove('is-open');
+      if (filterToggle) filterToggle.setAttribute('aria-expanded', 'false');
+      filterPanel.setAttribute('aria-hidden', 'true');
+      if (layout) layout.classList.remove('filters-open');
+    });
+  }
+
+  /* --- ACCORDEON GROUPES FILTRES --- */
+  document.querySelectorAll('[data-filter-group-toggle]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const expanded = btn.getAttribute('aria-expanded') === 'true';
+      btn.setAttribute('aria-expanded', !expanded);
+    });
+  });
+
+  /* --- TRI --- */
+  if (sortSelect) {
+    sortSelect.addEventListener('change', () => {
+      const url = new URL(window.location.href);
+      url.searchParams.set('sort_by', sortSelect.value);
+      window.location.href = url.toString();
+    });
+  }
+
+  /* --- FILTRES (submit sur changement) --- */
+  document.querySelectorAll('[data-filter-input]').forEach(input => {
+    input.addEventListener('change', () => submitFilters());
+  });
+
+  function submitFilters() {
+    const form = document.createElement('form');
+    form.method = 'GET';
+    form.action = window.location.pathname;
+
+    document.querySelectorAll('[data-filter-input]').forEach(input => {
+      if (input.type === 'checkbox' && input.checked) {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = input.name;
+        hidden.value = input.value;
+        form.appendChild(hidden);
+      } else if (input.type === 'number' && input.value !== '') {
+        const hidden = document.createElement('input');
+        hidden.type = 'hidden';
+        hidden.name = input.name;
+        hidden.value = input.value;
+        form.appendChild(hidden);
+      }
+    });
+
+    // Conserver le tri actif
+    if (sortSelect && sortSelect.value) {
+      const sortInput = document.createElement('input');
+      sortInput.type = 'hidden';
+      sortInput.name = 'sort_by';
+      sortInput.value = sortSelect.value;
+      form.appendChild(sortInput);
+    }
+
+    document.body.appendChild(form);
+    form.submit();
+  }
+})();
+{% endjavascript %}
+
+{% schema %}
+{
+  "name": "Catalogue produits",
+  "tag": "section",
+  "class": "section-collection-main",
+  "settings": [
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "min": 8,
+      "max": 24,
+      "step": 4,
+      "default": 12,
+      "label": "Produits par page"
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "Colonnes (desktop)",
+      "options": [
+        { "value": "2", "label": "2 colonnes" },
+        { "value": "3", "label": "3 colonnes" },
+        { "value": "4", "label": "4 colonnes" }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_filters",
+      "label": "Afficher les filtres",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sort",
+      "label": "Afficher le tri",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_product_count",
+      "label": "Afficher le nombre de produits",
+      "default": true
+    }
+  ],
+  "presets": [
+    { "name": "Catalogue produits" }
+  ]
+}
+{% endschema %}

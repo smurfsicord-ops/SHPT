@@ -1,0 +1,14 @@
+{
+  "sections": {
+    "catalogue-main": {
+      "type": "page-catalogue",
+      "settings": {
+        "heading": "Notre Catalogue",
+        "subheading": "Découvrez notre gamme complète de sous-vêtements Octipa.",
+        "columns": "3"
+      },
+      "blocks": {}
+    }
+  },
+  "order": ["catalogue-main"]
+}

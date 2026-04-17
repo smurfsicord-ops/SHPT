@@ -1,17 +1,16 @@
 {%- comment -%}
   Section: featured-collection
-  Description: Grille produits phares Octipa avec vraies collections Shopify
-  Schema: eyebrow, title, description, collection, cta_label, cta_url
+  Description: Grille produits manuels — blocs éditables dans l'éditeur Shopify
+  Schema: eyebrow, title, description, cta + blocks (product)
 {%- endcomment -%}
 
 {%- liquid
-  assign featured_collection = collections[section.settings.collection]
-  assign title_parts         = section.settings.title | split: '**'
-  assign products_limit      = section.settings.products_limit | default: 4
+  assign title_parts = section.settings.title | split: '**'
 -%}
 
 <section class="featured-collection section-spacing">
   <div class="container">
+
     <div class="section-header fade-up">
       {%- if section.settings.eyebrow != blank -%}
         <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
@@ -28,28 +27,89 @@
     </div>
 
     <div class="fc-grid">
-      {%- if featured_collection != blank and featured_collection.products_count > 0 -%}
-        {%- for product in featured_collection.products limit: products_limit -%}
-          {%- render 'card-product', product: product -%}
-        {%- endfor -%}
-      {%- else -%}
-        {%- for i in (1..4) -%}
-          <div class="card-product card-product--placeholder">
-            <div class="card-product__media">{{ 'product-' | append: i | placeholder_svg_tag: 'card-product__placeholder' }}</div>
-            <div class="card-product__info">
-              <h3 class="card-product__title">Produit exemple {{ i }}</h3>
-              <div class="card-product__price-wrapper"><span class="card-product__price">00,00 €</span></div>
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign on_sale = false
+          if block.settings.compare_price != blank
+            assign on_sale = true
+          endif
+        -%}
+        <article
+          class="card-product fade-up"
+          style="transition-delay:{{ forloop.index0 | times: 80 }}ms"
+          {{ block.shopify_attributes }}
+        >
+          {%- comment -%} IMAGE {%- endcomment -%}
+          <div class="card-product__media">
+            <a href="{{ block.settings.url | default: routes.all_products_collection_url }}" class="card-product__image-link" tabindex="-1">
+              {%- if block.settings.image != blank -%}
+                {{- block.settings.image
+                  | image_url: width: 600
+                  | image_tag:
+                    loading: 'lazy',
+                    width: 600,
+                    height: 750,
+                    class: 'card-product__img card-product__img--primary',
+                    alt: block.settings.name | escape
+                -}}
+              {%- else -%}
+                {{ 'product-' | append: forloop.index | placeholder_svg_tag: 'card-product__placeholder' }}
+              {%- endif -%}
+            </a>
+
+            {%- comment -%} BADGES {%- endcomment -%}
+            <div class="card-product__badges">
+              {%- if block.settings.badge != blank -%}
+                <span class="badge badge--bestseller">{{ block.settings.badge }}</span>
+              {%- endif -%}
+              {%- if on_sale -%}
+                <span class="badge badge--sale">Promo</span>
+              {%- endif -%}
             </div>
           </div>
-        {%- endfor -%}
-      {%- endif -%}
+
+          {%- comment -%} INFOS {%- endcomment -%}
+          <div class="card-product__info">
+            {%- if block.settings.flux != blank -%}
+              <span class="card-product__flux-badge flux-badge--{{ block.settings.flux | downcase | replace: ' ', '-' }}">
+                {{- block.settings.flux -}}
+              </span>
+            {%- endif -%}
+
+            <h3 class="card-product__title">
+              <a href="{{ block.settings.url | default: routes.all_products_collection_url }}" class="card-product__title-link">
+                {{- block.settings.name | default: 'Produit' -}}
+              </a>
+            </h3>
+
+            <div class="card-product__price-wrapper">
+              {%- if on_sale -%}
+                <s class="card-product__price--compare">
+                  <span class="sr-only">Ancien prix :</span>
+                  {{ block.settings.compare_price }}
+                </s>
+              {%- endif -%}
+              <span class="card-product__price{% if on_sale %} card-product__price--sale{% endif %}">
+                {{ block.settings.price | default: '0,00 €' }}
+              </span>
+            </div>
+
+            <a href="{{ block.settings.url | default: routes.all_products_collection_url }}" class="card-product__atc btn btn--primary">
+              Voir le produit
+            </a>
+          </div>
+        </article>
+      {%- endfor -%}
     </div>
 
     {%- if section.settings.cta_label != blank -%}
       <div class="fc-cta">
-        <a href="{{ section.settings.cta_url | default: '/collections/all' }}" class="btn btn--primary btn--lg">{{ section.settings.cta_label }}</a>
+        <a href="{{ section.settings.cta_url | default: routes.all_products_collection_url }}" class="btn btn--primary btn--lg">
+          {{ section.settings.cta_label }}
+        </a>
       </div>
     {%- endif -%}
+
   </div>
 </section>
 
@@ -63,19 +123,10 @@
   margin-block: 2.5rem;
 }
 
-@media (min-width: 768px) {
-  .fc-grid { grid-template-columns: repeat(3, 1fr); }
-}
+@media (min-width: 768px) { .fc-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1024px) { .fc-grid { grid-template-columns: repeat(4, 1fr); } }
 
-@media (min-width: 1024px) {
-  .fc-grid { grid-template-columns: repeat(4, 1fr); }
-}
-
-.fc-cta {
-  display: flex;
-  justify-content: center;
-  margin-top: 2.5rem;
-}
+.fc-cta { display: flex; justify-content: center; margin-top: 2.5rem; }
 
 .section-header { text-align: center; max-width: 640px; margin-inline: auto; }
 .section-eyebrow { font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: var(--color-primary, #5b8a8f); margin-bottom: 0.75rem; }
@@ -91,14 +142,37 @@
   "tag": "section",
   "class": "section-featured-collection",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Notre gamme" },
-    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Nos culottes **signature**" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Chaque modèle est conçu pour vous offrir confort, discrétion et protection au quotidien." },
-    { "type": "collection", "id": "collection", "label": "Collection à afficher" },
-    { "type": "range", "id": "products_limit", "label": "Nombre de produits", "min": 2, "max": 8, "step": 1, "default": 4 },
-    { "type": "text", "id": "cta_label", "label": "Texte du bouton", "default": "Voir toute la gamme" },
-    { "type": "url", "id": "cta_url", "label": "Lien du bouton" }
+    { "type": "text",     "id": "eyebrow",     "label": "Accroche",       "default": "Notre gamme" },
+    { "type": "textarea","id": "title",       "label": "Titre (**italic**)", "default": "Nos culottes **signature**" },
+    { "type": "textarea","id": "description", "label": "Description",     "default": "Chaque modèle est conçu pour vous offrir confort, discrétion et protection au quotidien." },
+    { "type": "text",     "id": "cta_label",   "label": "Texte du bouton", "default": "Voir toute la gamme" },
+    { "type": "url",      "id": "cta_url",     "label": "Lien du bouton" }
   ],
-  "presets": [{ "name": "Collection vedette" }]
+  "blocks": [
+    {
+      "type": "product",
+      "name": "Carte produit",
+      "settings": [
+        { "type": "image_picker", "id": "image",         "label": "Photo du produit" },
+        { "type": "text",         "id": "name",          "label": "Nom du produit",   "default": "Culotte Anti-Fuite" },
+        { "type": "text",         "id": "flux",          "label": "Niveau de flux",   "info": "Ex: Flux Modéré, Flux Élevé, Flux Intense" },
+        { "type": "text",         "id": "badge",         "label": "Badge",            "info": "Ex: Bestseller, Nouveau, -20%" },
+        { "type": "text",         "id": "price",         "label": "Prix",             "default": "29,90 €" },
+        { "type": "text",         "id": "compare_price", "label": "Prix barré",       "info": "Laisser vide si pas de promo" },
+        { "type": "url",          "id": "url",           "label": "Lien du produit" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection vedette",
+      "blocks": [
+        { "type": "product", "settings": { "name": "Culotte Flux Modéré",  "flux": "Flux Modéré",  "badge": "Bestseller", "price": "29,90 €", "compare_price": "" } },
+        { "type": "product", "settings": { "name": "Culotte Flux Élevé",   "flux": "Flux Élevé",   "badge": "Nouveau",    "price": "32,90 €", "compare_price": "" } },
+        { "type": "product", "settings": { "name": "Culotte Flux Intense",  "flux": "Flux Intense",  "badge": "",           "price": "34,90 €", "compare_price": "39,90 €" } },
+        { "type": "product", "settings": { "name": "Culotte Flux Nuit",     "flux": "Flux Nuit",     "badge": "-15%",       "price": "36,90 €", "compare_price": "43,90 €" } }
+      ]
+    }
+  ]
 }
 {% endschema %}

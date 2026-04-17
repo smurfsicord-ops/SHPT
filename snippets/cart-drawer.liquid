@@ -1,41 +1,60 @@
+{%- comment -%}
+  Snippet: cart-drawer
+  Description: Panier latéral AJAX Octipa
+{%- endcomment -%}
+
 <div id="CartOverlay" class="cart-overlay" aria-hidden="true"></div>
 <div id="CartPanel" class="cart-panel" role="dialog" aria-modal="true" aria-label="Panier">
   <div class="cart-panel-header">
     <span class="cart-panel-title">Mon Panier</span>
     <button id="CartPanelClose" class="cart-panel-close" aria-label="Fermer le panier">
-      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12"/></svg>
     </button>
   </div>
-  <div class="cart-panel-body">
+  <div class="cart-panel-body" id="CartPanelBody">
     {%- if cart.item_count == 0 -%}
       <div class="cart-empty-msg">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4zM3 6h18M16 10a4 4 0 01-8 0"/></svg>
         <p>Votre panier est vide</p>
-        <a href="/collections/all" class="btn btn--primary">Voir nos produits</a>
+        <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary">Voir nos produits</a>
       </div>
     {%- else -%}
       {%- for item in cart.items -%}
-        <div class="cart-item">
-          <img src="{{ item.image | img_url: '160x200', crop: 'center' }}" alt="{{ item.title | escape }}" width="80" height="100" loading="lazy">
-          <div>
+        <div class="cart-item" data-key="{{ item.key }}">
+          {{- item.image
+            | image_url: width: 160
+            | image_tag:
+              loading: 'lazy',
+              width: 80,
+              height: 100,
+              alt: item.title | escape
+          -}}
+          <div class="cart-item-details">
             <div class="cart-item-name">{{ item.product.title }}</div>
-            <div class="cart-item-variant">{{ item.variant.title }}</div>
+            {%- unless item.variant.title == 'Default Title' -%}
+              <div class="cart-item-variant">{{ item.variant.title }}</div>
+            {%- endunless -%}
             <div class="cart-item-price">{{ item.final_line_price | money }}</div>
           </div>
-          <a href="/cart/change?line={{ forloop.index }}&quantity=0" class="cart-item-remove" aria-label="Supprimer">&#215;</a>
+          <button
+            class="cart-item-remove"
+            aria-label="Supprimer {{ item.product.title | escape }}"
+            data-cart-remove
+            data-key="{{ item.key }}"
+          >&#215;</button>
         </div>
       {%- endfor -%}
     {%- endif -%}
   </div>
   {%- if cart.item_count > 0 -%}
-    <div class="cart-panel-footer">
+    <div class="cart-panel-footer" id="CartPanelFooter">
       <div class="cart-total-row">
         <span>Total</span>
         <span class="cart-total-price">{{ cart.total_price | money }}</span>
       </div>
       <p class="cart-note">&#10003; Livraison offerte dès 49€</p>
-      <a href="/checkout" class="btn btn--primary btn--lg">Commander →</a>
-      <a href="/cart" class="btn btn--outline">Voir le panier complet</a>
+      <a href="{{ routes.cart_url | append: '/checkout' | replace: '//checkout', '/checkout' }}" class="btn btn--primary btn--lg">Commander →</a>
+      <a href="{{ routes.cart_url }}" class="btn btn--outline">Voir le panier complet</a>
     </div>
   {%- endif -%}
 </div>

@@ -1,33 +1,64 @@
+{%- comment -%}
+  Template: product
+  Description: Page produit Octipa — galerie, variants, ATC
+{%- endcomment -%}
+
 <section class="section">
   <div class="container">
-    <div class="product-layout product-gallery">
+    <div class="product-layout">
+
+      {%- comment -%} GALERIE {%- endcomment -%}
       <div class="product-gallery">
         <div class="product-main-img-wrap">
           {%- if product.featured_image -%}
-            <img class="js-main-img" src="{{ product.featured_image | img_url: '800x1000', crop: 'center' }}" alt="{{ product.featured_image.alt | default: product.title | escape }}" width="800" height="1000" loading="eager">
+            {{- product.featured_image
+              | image_url: width: 800
+              | image_tag:
+                class: 'js-main-img',
+                loading: 'eager',
+                fetchpriority: 'high',
+                width: 800,
+                height: 1000,
+                alt: product.featured_image.alt | default: product.title | escape
+            -}}
           {%- else -%}
-            <img class="js-main-img" src="{{ 'hero-secondary.jpg' | asset_url }}" alt="{{ product.title | escape }}" width="800" height="1000" loading="eager">
+            {{ 'product-1' | placeholder_svg_tag: 'product-gallery__placeholder' }}
           {%- endif -%}
         </div>
         {%- if product.images.size > 1 -%}
           <div class="product-thumbs">
             {%- for img in product.images limit: 5 -%}
-              <button class="product-thumb{% if forloop.first %} active{% endif %}" data-src="{{ img | img_url: '800x1000', crop: 'center' }}" aria-label="Image {{ forloop.index }}">
-                <img src="{{ img | img_url: '140x176', crop: 'center' }}" alt="" width="70" height="88" loading="lazy">
+              <button
+                class="product-thumb{% if forloop.first %} active{% endif %}"
+                data-src="{{ img | image_url: width: 800 }}"
+                aria-label="Image {{ forloop.index }} — {{ product.title | escape }}"
+              >
+                {{- img
+                  | image_url: width: 140
+                  | image_tag:
+                    loading: 'lazy',
+                    width: 70,
+                    height: 88,
+                    alt: ''
+                -}}
               </button>
             {%- endfor -%}
           </div>
         {%- endif -%}
       </div>
-      <div>
+
+      {%- comment -%} INFOS PRODUIT {%- endcomment -%}
+      <div class="product-info">
         <p class="product-type">{{ product.type }}</p>
         <h1 style="font-family:var(--font-display);font-size:var(--text-2xl);font-weight:400;margin-bottom:1rem;line-height:1.1">{{ product.title }}</h1>
+
         <div class="product-price-row" style="margin-bottom:1.5rem">
           <span class="product-price" style="font-size:var(--text-xl)">{{ product.selected_or_first_available_variant.price | money }}</span>
           {%- if product.compare_at_price > product.price -%}
             <span class="product-compare" style="font-size:var(--text-base)">{{ product.compare_at_price | money }}</span>
           {%- endif -%}
         </div>
+
         {%- if product.variants.size > 1 -%}
           <div style="margin-bottom:1.5rem">
             <p style="font-size:var(--text-xs);font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:var(--color-text-muted);margin-bottom:.75rem">{{ product.options.first }}</p>
@@ -38,21 +69,24 @@
             </div>
           </div>
         {%- endif -%}
-        <form action="/cart/add" method="post" style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem">
-          <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}">
+
+        <form action="{{ routes.cart_add_url }}" method="post" style="display:flex;flex-direction:column;gap:.75rem;margin-bottom:1.5rem" id="ProductForm">
+          <input type="hidden" name="id" id="VariantId" value="{{ product.selected_or_first_available_variant.id }}">
           <div class="qty-wrap">
-            <button type="button" class="qty-btn" data-action="minus" aria-label="Diminuer">−</button>
+            <button type="button" class="qty-btn" data-action="minus" aria-label="Diminuer la quantité">&#8722;</button>
             <input class="qty-input" type="number" name="quantity" value="1" min="1" aria-label="Quantité">
-            <button type="button" class="qty-btn" data-action="plus" aria-label="Augmenter">+</button>
+            <button type="button" class="qty-btn" data-action="plus" aria-label="Augmenter la quantité">+</button>
           </div>
           <button type="submit" class="btn btn--primary btn--lg js-add-to-cart">Ajouter au panier</button>
         </form>
+
         {%- if product.description != blank -%}
           <div style="border-top:1px solid var(--color-divider);padding-top:1.5rem;font-size:var(--text-sm);color:var(--color-text-muted);line-height:1.75">
             {{ product.description }}
           </div>
         {%- endif -%}
       </div>
+
     </div>
   </div>
 </section>

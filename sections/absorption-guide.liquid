@@ -1,74 +1,152 @@
-{%- assign title_parts = section.settings.title | split: '**' -%}
-<section class="section section-bg">
+{%- comment -%}
+  Section: absorption-guide
+  Description: Guide des niveaux de flux Octipa — éducatif et interactif
+  Schema: eyebrow, title, description, cta, blocks (level)
+{%- endcomment -%}
+
+{%- liquid
+  assign title_parts = section.settings.title | split: '**'
+-%}
+
+<section class="absorption-guide section-spacing">
   <div class="container">
-    <div class="absorption-grid">
-      <div>
-        <p class="section-eyebrow fade-up">{{ section.settings.eyebrow }}</p>
-        <h2 class="section-title fade-up" style="text-align:left;transition-delay:80ms">
-          {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
-        </h2>
-        <p style="font-size:var(--text-base);color:var(--color-text-muted);max-width:44ch;line-height:1.75;margin-bottom:2rem" class="fade-up">{{ section.settings.description }}</p>
-        <div class="absorption-levels">
-          {%- for block in section.blocks -%}
-            <div class="absorption-level fade-up" style="transition-delay:{{ forloop.index0 | times: 80 | plus: 150 }}ms" {{ block.shopify_attributes }}>
-              <div class="drops">
-                {%- for i in (1..4) -%}
-                  <span class="drop{% if i <= block.settings.drops %} full{% endif %}"></span>
-                {%- endfor -%}
-              </div>
-              <div class="absorption-info">
-                <div class="absorption-name">{{ block.settings.name }}</div>
-                <div class="absorption-sub">{{ block.settings.description }}</div>
-              </div>
-              <span class="absorption-badge" style="background:{{ block.settings.badge_bg }};color:{{ block.settings.badge_color }}">{{ block.settings.badge }}</span>
-            </div>
-          {%- endfor -%}
-        </div>
-        <div style="margin-top:2rem">
-          <a href="{{ section.settings.cta_url }}" class="btn btn--primary btn--lg fade-up" style="transition-delay:400ms">{{ section.settings.cta_label }}</a>
-        </div>
-      </div>
-      <div class="absorption-visual fade-up" style="transition-delay:200ms">
-        {%- if section.settings.image != blank -%}
-          {{ section.settings.image | img_url: '700x875', crop: 'center' | img_tag: 'Guide absorption', 'loading="lazy" width="700" height="875"' }}
-        {%- else -%}
-          <img src="{{ 'hero-secondary.jpg' | asset_url }}" alt="Guide absorption" width="700" height="875" loading="lazy">
-        {%- endif -%}
-      </div>
+    <div class="section-header fade-up">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      <h2 class="section-title">
+        {%- for part in title_parts -%}
+          {%- if forloop.index0 == 1 -%}<em>{{ part }}</em>{%- else -%}{{ part }}{%- endif -%}
+        {%- endfor -%}
+      </h2>
+      {%- if section.settings.description != blank -%}
+        <p class="section-desc">{{ section.settings.description }}</p>
+      {%- endif -%}
+      <div class="section-divider"></div>
     </div>
+
+    <div class="ag-grid">
+      {%- for block in section.blocks -%}
+        {%- liquid
+          assign drops = block.settings.drops | default: 1
+        -%}
+        <article class="ag-card fade-up" style="transition-delay:{{ forloop.index0 | times: 80 }}ms" {{ block.shopify_attributes }}>
+          <div class="ag-drops" aria-label="{{ drops }} goutte(s) d'absorption">
+            {%- for i in (1..4) -%}
+              <svg class="ag-drop{% if i <= drops %} ag-drop--active{% endif %}" width="20" height="28" viewBox="0 0 20 28" fill="none" aria-hidden="true">
+                <path d="M10 2 C10 2 2 12 2 18 a8 8 0 0 0 16 0 C18 12 10 2 10 2z"/>
+              </svg>
+            {%- endfor -%}
+          </div>
+          <span
+            class="ag-badge"
+            style="background:{{ block.settings.badge_bg | default: '#e8f5e9' }};color:{{ block.settings.badge_color | default: '#2e7d32' }}"
+          >{{ block.settings.badge }}</span>
+          <h3 class="ag-name">{{ block.settings.name }}</h3>
+          <p class="ag-desc">{{ block.settings.description }}</p>
+        </article>
+      {%- endfor -%}
+    </div>
+
+    {%- if section.settings.cta_label != blank -%}
+      <div class="fc-cta">
+        <a href="{{ section.settings.cta_url | default: '/pages/diagnostic' }}" class="btn btn--primary btn--lg">{{ section.settings.cta_label }}</a>
+      </div>
+    {%- endif -%}
   </div>
 </section>
 
+{% stylesheet %}
+.absorption-guide { padding-block: clamp(3rem, 6vw, 5rem); background: var(--color-surface, #f9f8f5); }
+
+.ag-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  margin-block: 2.5rem;
+}
+
+@media (min-width: 768px) {
+  .ag-grid { grid-template-columns: repeat(4, 1fr); }
+}
+
+.ag-card {
+  background: #fff;
+  border-radius: 12px;
+  padding: clamp(1.25rem, 3vw, 1.75rem);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 4px 12px rgba(0,0,0,.04);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.ag-card:hover { transform: translateY(-3px); box-shadow: 0 4px 20px rgba(0,0,0,.1); }
+
+.ag-drops {
+  display: flex;
+  gap: 4px;
+  align-items: flex-end;
+}
+
+.ag-drop { fill: var(--color-border, #d4d1ca); transition: fill 200ms ease; }
+.ag-drop--active { fill: var(--color-primary, #5b8a8f); }
+
+.ag-badge {
+  display: inline-flex;
+  width: fit-content;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+}
+
+.ag-name {
+  font-size: clamp(1rem, 0.95rem + 0.2vw, 1.15rem);
+  font-weight: 700;
+  color: var(--color-text, #28251d);
+  line-height: 1.2;
+}
+
+.ag-desc {
+  font-size: 0.875rem;
+  color: var(--color-text-muted, #7a7974);
+  line-height: 1.6;
+}
+{% endstylesheet %}
+
 {% schema %}
 {
-  "name": "Guide absorption",
+  "name": "Guide flux",
+  "tag": "section",
+  "class": "section-absorption-guide",
   "settings": [
     { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Comment choisir" },
     { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Trouvez votre **flux idéal**" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Chaque peau est unique. Nos formules s'adaptent à votre type de peau pour une absorption optimale." },
-    { "type": "image_picker", "id": "image", "label": "Image" },
-    { "type": "text", "id": "cta_label", "label": "Texte bouton", "default": "Faire le diagnostic" },
-    { "type": "url", "id": "cta_url", "label": "Lien bouton", "default": "/pages/diagnostic" }
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Chaque femme est unique. Nos modèles s'adaptent à votre niveau de protection pour un confort optimal." },
+    { "type": "text", "id": "cta_label", "label": "Texte du bouton", "default": "Faire le diagnostic" },
+    { "type": "url", "id": "cta_url", "label": "Lien du bouton" }
   ],
   "blocks": [{
     "type": "level",
-    "name": "Niveau d'absorption",
+    "name": "Niveau de flux",
     "settings": [
-      { "type": "text", "id": "name", "label": "Nom", "default": "Flux Léger" },
-      { "type": "text", "id": "description", "label": "Description", "default": "Peaux normales à mixtes" },
-      { "type": "range", "id": "drops", "label": "Niveau (1-4)", "min": 1, "max": 4, "step": 1, "default": 1 },
-      { "type": "text", "id": "badge", "label": "Badge", "default": "Absorption 30min" },
-      { "type": "text", "id": "badge_bg", "label": "Fond badge (hex)", "default": "#e8f5e9" },
+      { "type": "text", "id": "name", "label": "Nom", "default": "Flux Modéré" },
+      { "type": "text", "id": "description", "label": "Description", "default": "Fuites légères, activité quotidienne" },
+      { "type": "range", "id": "drops", "label": "Nombre de gouttes (1-4)", "min": 1, "max": 4, "step": 1, "default": 1 },
+      { "type": "text", "id": "badge", "label": "Badge", "default": "Jusqu'à 50ml" },
+      { "type": "text", "id": "badge_bg", "label": "Couleur fond badge (hex)", "default": "#e8f5e9" },
       { "type": "text", "id": "badge_color", "label": "Couleur texte badge (hex)", "default": "#2e7d32" }
     ]
   }],
   "presets": [{
-    "name": "Guide absorption",
+    "name": "Guide flux",
     "blocks": [
-      { "type": "level", "settings": { "name": "Flux Léger", "description": "Peaux normales à mixtes", "drops": 1, "badge": "Absorption 30min", "badge_bg": "#e8f5e9", "badge_color": "#2e7d32" } },
-      { "type": "level", "settings": { "name": "Flux Moyen", "description": "Peaux sèches, nutrition ciblée", "drops": 2, "badge": "Absorption 2h", "badge_bg": "#fff8e1", "badge_color": "#f57f17" } },
-      { "type": "level", "settings": { "name": "Flux Intense", "description": "Peaux très sèches, réparation", "drops": 3, "badge": "Absorption 4h", "badge_bg": "#fce4ec", "badge_color": "#c62828" } },
-      { "type": "level", "settings": { "name": "Flux Nuit", "description": "Soin régénérateur nocturne", "drops": 4, "badge": "Action nocturne", "badge_bg": "#ede7f6", "badge_color": "#4527a0" } }
+      { "type": "level", "settings": { "name": "Flux Modéré", "description": "Fuites légères au quotidien", "drops": 1, "badge": "Jusqu'à 50ml", "badge_bg": "#e8f5e9", "badge_color": "#2e7d32" } },
+      { "type": "level", "settings": { "name": "Flux Élevé", "description": "Protection renforcée, sport", "drops": 2, "badge": "Jusqu'à 100ml", "badge_bg": "#fff8e1", "badge_color": "#f57f17" } },
+      { "type": "level", "settings": { "name": "Flux Intense", "description": "Fuites importantes, nuit", "drops": 3, "badge": "Jusqu'à 200ml", "badge_bg": "#fce4ec", "badge_color": "#c62828" } },
+      { "type": "level", "settings": { "name": "Flux Nuit", "description": "Protection nuit complète", "drops": 4, "badge": "Jusqu'à 300ml", "badge_bg": "#ede7f6", "badge_color": "#4527a0" } }
     ]
   }]
 }

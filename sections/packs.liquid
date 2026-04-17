@@ -1,4 +1,13 @@
-{%- assign title_parts = section.settings.title | split: '**' -%}
+{%- comment -%}
+  Section: packs
+  Description: Grille des packs Octipa — culottes anti-fuite
+  Schema: eyebrow, title, description + blocks (pack)
+{%- endcomment -%}
+
+{%- liquid
+  assign title_parts = section.settings.title | split: '**'
+-%}
+
 <section class="section">
   <div class="container">
     <div class="section-header fade-up">
@@ -14,7 +23,13 @@
         <article class="pack-card fade-up" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}>
           <div class="pack-img">
             {%- if block.settings.image != blank -%}
-              {{ block.settings.image | img_url: '500x620', crop: 'center' | img_tag: block.settings.name, 'loading="lazy" width="500" height="620"' }}
+              {{- block.settings.image | image_url: width: 500, height: 620, crop: 'center'
+                | image_tag:
+                  loading: 'lazy',
+                  width: 500,
+                  height: 620,
+                  alt: block.settings.name | escape
+              -}}
             {%- else -%}
               <img src="{{ 'hero-secondary.jpg' | asset_url }}" alt="{{ block.settings.name | escape }}" width="500" height="620" loading="lazy">
             {%- endif -%}
@@ -39,11 +54,13 @@
 
 {% schema %}
 {
-  "name": "Packs Everyday",
+  "name": "Packs Octipa",
+  "tag": "section",
+  "class": "section-packs",
   "settings": [
     { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Nos offres" },
     { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Packs **Everyday**" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Économisez jusqu'à 30% en optant pour nos packs soigneusement composés." }
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Économisez jusqu'à 28% en optant pour nos packs soigneusement composés." }
   ],
   "blocks": [{
     "type": "pack",
@@ -51,20 +68,20 @@
     "settings": [
       { "type": "image_picker", "id": "image", "label": "Image du pack" },
       { "type": "text", "id": "name", "label": "Nom", "default": "Pack Découverte" },
-      { "type": "text", "id": "contents", "label": "Contenu", "default": "Sérum + Crème Légère" },
-      { "type": "text", "id": "saving", "label": "Économie", "default": "Économisez 15%" },
-      { "type": "text", "id": "price", "label": "Prix", "default": "69,90 €" },
-      { "type": "text", "id": "compare_price", "label": "Prix barré", "default": "83,80 €" },
+      { "type": "text", "id": "contents", "label": "Contenu", "default": "2 culottes anti-fuite" },
+      { "type": "text", "id": "saving", "label": "Économie", "default": "Économisez 10%" },
+      { "type": "text", "id": "price", "label": "Prix", "default": "49,90 €" },
+      { "type": "text", "id": "compare_price", "label": "Prix barré", "default": "55,80 €" },
       { "type": "url", "id": "url", "label": "Lien" }
     ]
   }],
   "presets": [{
-    "name": "Packs Everyday",
+    "name": "Packs Octipa",
     "blocks": [
-      { "type": "pack", "settings": { "name": "Pack Découverte", "contents": "Sérum + Crème Légère", "saving": "Économisez 15%", "price": "69,90 €", "compare_price": "83,80 €" } },
-      { "type": "pack", "settings": { "name": "Pack Routine Complète", "contents": "Sérum + Crème + Huile Nuit", "saving": "Économisez 22%", "price": "99,90 €", "compare_price": "128,70 €" } },
-      { "type": "pack", "settings": { "name": "Pack Intensif", "contents": "Sérum x2 + Masque + Huile", "saving": "Économisez 28%", "price": "119,90 €", "compare_price": "166,60 €" } },
-      { "type": "pack", "settings": { "name": "Pack Best-Sellers", "contents": "Nos 4 produits signature", "saving": "Économisez 30%", "price": "139,90 €", "compare_price": "199,60 €" } }
+      { "type": "pack", "settings": { "name": "Pack Découverte", "contents": "2 culottes anti-fuite", "saving": "Économisez 10%", "price": "49,90 €", "compare_price": "55,80 €" } },
+      { "type": "pack", "settings": { "name": "Pack Confort", "contents": "4 culottes assortiment", "saving": "Économisez 20%", "price": "89,90 €", "compare_price": "111,60 €" } },
+      { "type": "pack", "settings": { "name": "Pack Semaine", "contents": "7 culottes rotation", "saving": "Économisez 28%", "price": "139,90 €", "compare_price": "195,30 €" } },
+      { "type": "pack", "settings": { "name": "Pack Best-Sellers", "contents": "Nos 4 modèles signature", "saving": "Économisez 25%", "price": "119,90 €", "compare_price": "159,60 €" } }
     ]
   }]
 }

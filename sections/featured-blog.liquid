@@ -1,68 +1,136 @@
-{%- assign title_parts = section.settings.title | split: '**' -%}
-<section class="section">
+{%- comment -%}
+  Section: featured-blog
+  Description: Aperçu articles de blog Octipa — conseils et guides
+  Schema: eyebrow, title, description, blog, cta_label, cta_url
+{%- endcomment -%}
+
+{%- liquid
+  assign title_parts   = section.settings.title | split: '**'
+  assign featured_blog = blogs[section.settings.blog]
+-%}
+
+<section class="featured-blog section-spacing">
   <div class="container">
     <div class="section-header fade-up">
-      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
       <h2 class="section-title">
-        {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
+        {%- for part in title_parts -%}
+          {%- if forloop.index0 == 1 -%}<em>{{ part }}</em>{%- else -%}{{ part }}{%- endif -%}
+        {%- endfor -%}
       </h2>
-      <p class="section-desc">{{ section.settings.description }}</p>
+      {%- if section.settings.description != blank -%}
+        <p class="section-desc">{{ section.settings.description }}</p>
+      {%- endif -%}
       <div class="section-divider"></div>
     </div>
+
     <div class="blog-grid">
-      {%- for block in section.blocks -%}
-        <article class="blog-card fade-up" style="transition-delay:{{ forloop.index0 | times: 100 }}ms" {{ block.shopify_attributes }}>
-          <div class="blog-img">
-            {%- if block.settings.image != blank -%}
-              {{ block.settings.image | img_url: '600x400', crop: 'center' | img_tag: block.settings.title, 'loading="lazy" width="600" height="400"' }}
-            {%- else -%}
-              <img src="{{ 'hero-main.jpg' | asset_url }}" alt="{{ block.settings.title | escape }}" width="600" height="400" loading="lazy">
-            {%- endif -%}
-          </div>
-          <div class="blog-body">
-            <p class="blog-cat">{{ block.settings.category }}</p>
-            <h3 class="blog-title"><a href="{{ block.settings.url | default: '/blogs/news' }}">{{ block.settings.title }}</a></h3>
-            <p class="blog-excerpt">{{ block.settings.excerpt }}</p>
-          </div>
-        </article>
-      {%- endfor -%}
+      {%- if featured_blog != blank and featured_blog.articles_count > 0 -%}
+        {%- for article in featured_blog.articles limit: 3 -%}
+          <article class="blog-card fade-up" style="transition-delay:{{ forloop.index0 | times: 100 }}ms">
+            <a href="{{ article.url }}" class="blog-card__img-link" tabindex="-1" aria-hidden="true">
+              {%- if article.image -%}
+                {{- article.image | image_url: width: 600
+                  | image_tag:
+                    loading: 'lazy',
+                    width: 600,
+                    height: 400,
+                    class: 'blog-card__img',
+                    alt: article.image.alt | default: article.title
+                -}}
+              {%- else -%}
+                <div class="blog-card__img-placeholder">{{ 'image' | placeholder_svg_tag: 'blog-card__placeholder-svg' }}</div>
+              {%- endif -%}
+            </a>
+            <div class="blog-card__body">
+              {%- if article.tags.first != blank -%}
+                <span class="blog-card__tag">{{ article.tags.first }}</span>
+              {%- endif -%}
+              <h3 class="blog-card__title"><a href="{{ article.url }}">{{ article.title }}</a></h3>
+              <p class="blog-card__excerpt">{{ article.excerpt_or_content | strip_html | truncate: 100 }}</p>
+              <div class="blog-card__meta">
+                <time datetime="{{ article.published_at | date: '%Y-%m-%d' }}">{{ article.published_at | date: '%d %B %Y' }}</time>
+              </div>
+            </div>
+          </article>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..3) -%}
+          <article class="blog-card blog-card--placeholder">
+            <div class="blog-card__img-placeholder">{{ 'image' | placeholder_svg_tag: 'blog-card__placeholder-svg' }}</div>
+            <div class="blog-card__body">
+              <span class="blog-card__tag">Conseil</span>
+              <h3 class="blog-card__title">Titre de l'article {{ i }}</h3>
+              <p class="blog-card__excerpt">Ajoutez vos articles dans Shopify admin → Blog.</p>
+            </div>
+          </article>
+        {%- endfor -%}
+      {%- endif -%}
     </div>
+
     {%- if section.settings.cta_label != blank -%}
-      <div style="text-align:center;margin-top:2.5rem">
-        <a href="{{ section.settings.cta_url | default: '/blogs/news' }}" class="btn btn--outline btn--lg">{{ section.settings.cta_label }}</a>
+      <div class="fc-cta">
+        <a href="{{ section.settings.cta_url | default: '/blogs/news' }}" class="btn btn--ghost btn--lg">{{ section.settings.cta_label }}</a>
       </div>
     {%- endif -%}
   </div>
 </section>
 
+{% stylesheet %}
+.featured-blog { padding-block: clamp(3rem, 6vw, 5rem); }
+
+.blog-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(1rem, 2.5vw, 1.5rem);
+  margin-block: 2.5rem;
+}
+
+@media (min-width: 640px) { .blog-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 1024px) { .blog-grid { grid-template-columns: repeat(3, 1fr); } }
+
+.blog-card {
+  background: var(--color-surface, #f9f8f5);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.blog-card:hover { transform: translateY(-3px); box-shadow: 0 4px 20px rgba(0,0,0,.08); }
+
+.blog-card__img-link { display: block; aspect-ratio: 3/2; overflow: hidden; }
+.blog-card__img { width: 100%; height: 100%; object-fit: cover; transition: transform 400ms ease; }
+.blog-card:hover .blog-card__img { transform: scale(1.04); }
+.blog-card__img-placeholder { aspect-ratio: 3/2; background: var(--color-surface-offset, #f3f0ec); display: flex; align-items: center; justify-content: center; }
+.blog-card__placeholder-svg { width: 60px; height: 60px; opacity: .2; }
+
+.blog-card__body { padding: 1.25rem; display: flex; flex-direction: column; gap: 0.5rem; flex: 1; }
+.blog-card__tag { font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: var(--color-primary, #5b8a8f); }
+.blog-card__title { font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.1rem); font-weight: 700; line-height: 1.35; color: var(--color-text, #28251d); }
+.blog-card__title a { text-decoration: none; color: inherit; }
+.blog-card__title a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.blog-card__excerpt { font-size: 0.875rem; color: var(--color-text-muted, #7a7974); line-height: 1.6; flex: 1; }
+.blog-card__meta { font-size: 0.75rem; color: var(--color-text-faint, #bab9b4); margin-top: auto; padding-top: 0.5rem; border-top: 1px solid var(--color-divider, #dcd9d5); }
+{% endstylesheet %}
+
 {% schema %}
 {
   "name": "Blog vedette",
+  "tag": "section",
+  "class": "section-featured-blog",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Le journal Octipa" },
-    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Nos **conseils beauté**" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Conseils d'experts, rituels beauté et actualités de nos formulations." },
-    { "type": "text", "id": "cta_label", "label": "Bouton voir tout", "default": "Voir tous les articles" },
-    { "type": "url", "id": "cta_url", "label": "Lien bouton", "default": "/blogs/news" }
+    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Nos conseils" },
+    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Le journal **Octipa**" },
+    { "type": "textarea", "id": "description", "label": "Description", "default": "Conseils bien-être, guides pratiques et témoignages pour vivre pleinement." },
+    { "type": "blog", "id": "blog", "label": "Blog à afficher" },
+    { "type": "text", "id": "cta_label", "label": "Texte du bouton", "default": "Voir tous les articles" },
+    { "type": "url", "id": "cta_url", "label": "Lien du bouton" }
   ],
-  "blocks": [{
-    "type": "article",
-    "name": "Article",
-    "settings": [
-      { "type": "image_picker", "id": "image", "label": "Image" },
-      { "type": "text", "id": "category", "label": "Catégorie", "default": "Routine" },
-      { "type": "text", "id": "title", "label": "Titre", "default": "5 gestes pour une peau éclatante" },
-      { "type": "textarea", "id": "excerpt", "label": "Extrait", "default": "Découvrez les rituels de soin qui font vraiment la différence pour une peau lumineuse." },
-      { "type": "url", "id": "url", "label": "Lien article" }
-    ]
-  }],
-  "presets": [{
-    "name": "Blog vedette",
-    "blocks": [
-      { "type": "article", "settings": { "category": "Routine", "title": "5 gestes pour une peau éclatante au quotidien", "excerpt": "Découvrez les rituels de soin qui font vraiment la différence pour une peau lumineuse et hydratée." } },
-      { "type": "article", "settings": { "category": "Ingrédients", "title": "L'huile de rosier muscat, l'or de nos formules", "excerpt": "Zoom sur cet ingrédient star sélectionné pour ses propriétés régénératrices exceptionnelles." } },
-      { "type": "article", "settings": { "category": "Conseil", "title": "Comment adapter sa routine selon les saisons", "excerpt": "Votre peau a des besoins différents en hiver et en été. Voici comment ajuster votre routine beauté." } }
-    ]
-  }]
+  "presets": [{ "name": "Blog vedette" }]
 }
 {% endschema %}

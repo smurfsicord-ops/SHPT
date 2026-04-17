@@ -8,43 +8,66 @@
   assign title_parts = section.settings.title | split: '**'
 -%}
 
-<section class="section">
+<section class="section-packs">
   <div class="container">
     <div class="section-header fade-up">
-      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
       <h2 class="section-title">
-        {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
+        {%- for p in title_parts -%}
+          {%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}
+        {%- endfor -%}
       </h2>
-      <p class="section-desc">{{ section.settings.description }}</p>
+      {%- if section.settings.description != blank -%}
+        <p class="section-desc">{{ section.settings.description }}</p>
+      {%- endif -%}
       <div class="section-divider"></div>
     </div>
+
     <div class="packs-grid">
       {%- for block in section.blocks -%}
-        <article class="pack-card fade-up" style="transition-delay:{{ forloop.index0 | times: 90 }}ms" {{ block.shopify_attributes }}>
-          <div class="pack-img">
+        <article
+          class="pack-card fade-up"
+          style="transition-delay:{{ forloop.index0 | times: 90 }}ms"
+          {{ block.shopify_attributes }}
+        >
+          <div class="pack-card__img">
             {%- if block.settings.image != blank -%}
-              {{- block.settings.image | image_url: width: 500, height: 620, crop: 'center'
+              {{- block.settings.image
+                | image_url: width: 500
                 | image_tag:
                   loading: 'lazy',
                   width: 500,
                   height: 620,
+                  class: 'pack-card__photo',
                   alt: block.settings.name | escape
               -}}
             {%- else -%}
-              <img src="{{ 'hero-secondary.jpg' | asset_url }}" alt="{{ block.settings.name | escape }}" width="500" height="620" loading="lazy">
+              {{ 'product-1' | placeholder_svg_tag: 'pack-card__placeholder' }}
+            {%- endif -%}
+            {%- if block.settings.saving != blank -%}
+              <span class="pack-card__badge">{{ block.settings.saving }}</span>
             {%- endif -%}
           </div>
-          <div class="pack-body">
-            <p class="pack-type">{{ block.settings.contents }}</p>
-            <h3 class="pack-name">{{ block.settings.name }}</h3>
-            <span class="pack-saving">{{ block.settings.saving }}</span>
-            <div>
-              <span class="pack-price">{{ block.settings.price }}</span>
+
+          <div class="pack-card__body">
+            {%- if block.settings.contents != blank -%}
+              <p class="pack-card__type">{{ block.settings.contents }}</p>
+            {%- endif -%}
+            <h3 class="pack-card__name">{{ block.settings.name | default: 'Pack' }}</h3>
+            <div class="pack-card__prices">
+              <span class="pack-card__price">{{ block.settings.price | default: '0,00 €' }}</span>
               {%- if block.settings.compare_price != blank -%}
-                <span class="pack-compare"> {{ block.settings.compare_price }}</span>
+                <s class="pack-card__compare">{{ block.settings.compare_price }}</s>
               {%- endif -%}
             </div>
-            <a href="{{ block.settings.url | default: '/collections/packs' }}" class="btn btn--gold">Choisir ce pack</a>
+            <a
+              href="{{ block.settings.url | default: '/collections/packs' }}"
+              class="btn btn--primary"
+            >
+              Choisir ce pack
+            </a>
           </div>
         </article>
       {%- endfor -%}
@@ -52,36 +75,177 @@
   </div>
 </section>
 
+{% stylesheet %}
+/* ============================================================
+   SECTION PACKS — Octipa
+   Grille horizontale : 1 col mobile → 2 col tablette → 4 col desktop
+   ============================================================ */
+
+.section-packs {
+  padding-block: clamp(3rem, 6vw, 5rem);
+  background: var(--color-bg);
+}
+
+/* HEADER */
+.section-packs .section-header {
+  text-align: center;
+  max-width: 640px;
+  margin-inline: auto;
+  margin-bottom: 2.5rem;
+}
+
+/* GRILLE HORIZONTALE */
+.packs-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: clamp(0.75rem, 2vw, 1.5rem);
+}
+
+@media (min-width: 1024px) {
+  .packs-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* CARTE PACK */
+.pack-card {
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-interactive), box-shadow var(--transition-interactive);
+}
+
+.pack-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+/* IMAGE */
+.pack-card__img {
+  position: relative;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  background: var(--color-surface-offset);
+}
+
+.pack-card__photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 400ms ease;
+}
+
+.pack-card:hover .pack-card__photo {
+  transform: scale(1.04);
+}
+
+.pack-card__placeholder {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* BADGE ÉCONOMIE */
+.pack-card__badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: var(--color-primary);
+  color: var(--color-text-inverse);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: .03em;
+  padding: 4px 10px;
+  border-radius: var(--radius-full);
+}
+
+/* BODY */
+.pack-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  flex: 1;
+}
+
+.pack-card__type {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  margin: 0;
+}
+
+.pack-card__name {
+  font-family: var(--font-display);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.pack-card__prices {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.pack-card__price {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.pack-card__compare {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  text-decoration: line-through;
+}
+
+.pack-card__body .btn {
+  width: 100%;
+  margin-top: var(--space-2);
+  justify-content: center;
+}
+{% endstylesheet %}
+
 {% schema %}
 {
   "name": "Packs Octipa",
   "tag": "section",
   "class": "section-packs",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Nos offres" },
-    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Packs **Everyday**" },
-    { "type": "textarea", "id": "description", "label": "Description", "default": "Économisez jusqu'à 28% en optant pour nos packs soigneusement composés." }
+    { "type": "text",     "id": "eyebrow",     "label": "Accroche",           "default": "Nos offres" },
+    { "type": "textarea","id": "title",       "label": "Titre (**italic**)",  "default": "Packs **Everyday**" },
+    { "type": "textarea","id": "description", "label": "Description",         "default": "Économisez jusqu’à 28% en optant pour nos packs soigneusement composés." }
   ],
   "blocks": [{
     "type": "pack",
     "name": "Pack",
     "settings": [
-      { "type": "image_picker", "id": "image", "label": "Image du pack" },
-      { "type": "text", "id": "name", "label": "Nom", "default": "Pack Découverte" },
-      { "type": "text", "id": "contents", "label": "Contenu", "default": "2 culottes anti-fuite" },
-      { "type": "text", "id": "saving", "label": "Économie", "default": "Économisez 10%" },
-      { "type": "text", "id": "price", "label": "Prix", "default": "49,90 €" },
-      { "type": "text", "id": "compare_price", "label": "Prix barré", "default": "55,80 €" },
-      { "type": "url", "id": "url", "label": "Lien" }
+      { "type": "image_picker", "id": "image",         "label": "Image du pack" },
+      { "type": "text",         "id": "name",          "label": "Nom",          "default": "Pack Découverte" },
+      { "type": "text",         "id": "contents",      "label": "Contenu",      "default": "2 culottes anti-fuite" },
+      { "type": "text",         "id": "saving",        "label": "Économie",     "default": "Économisez 10%" },
+      { "type": "text",         "id": "price",         "label": "Prix",         "default": "49,90 €" },
+      { "type": "text",         "id": "compare_price", "label": "Prix barré",   "default": "55,80 €" },
+      { "type": "url",          "id": "url",           "label": "Lien" }
     ]
   }],
   "presets": [{
     "name": "Packs Octipa",
     "blocks": [
-      { "type": "pack", "settings": { "name": "Pack Découverte", "contents": "2 culottes anti-fuite", "saving": "Économisez 10%", "price": "49,90 €", "compare_price": "55,80 €" } },
-      { "type": "pack", "settings": { "name": "Pack Confort", "contents": "4 culottes assortiment", "saving": "Économisez 20%", "price": "89,90 €", "compare_price": "111,60 €" } },
-      { "type": "pack", "settings": { "name": "Pack Semaine", "contents": "7 culottes rotation", "saving": "Économisez 28%", "price": "139,90 €", "compare_price": "195,30 €" } },
-      { "type": "pack", "settings": { "name": "Pack Best-Sellers", "contents": "Nos 4 modèles signature", "saving": "Économisez 25%", "price": "119,90 €", "compare_price": "159,60 €" } }
+      { "type": "pack", "settings": { "name": "Pack Découverte",  "contents": "2 culottes anti-fuite",       "saving": "Économisez 10%", "price": "49,90 €",  "compare_price": "55,80 €"  } },
+      { "type": "pack", "settings": { "name": "Pack Confort",     "contents": "4 culottes assortiment",     "saving": "Économisez 20%", "price": "89,90 €",  "compare_price": "111,60 €" } },
+      { "type": "pack", "settings": { "name": "Pack Semaine",     "contents": "7 culottes rotation",        "saving": "Économisez 28%", "price": "139,90 €", "compare_price": "195,30 €" } },
+      { "type": "pack", "settings": { "name": "Pack Best-Sellers","contents": "Nos 4 modèles signature",   "saving": "Économisez 25%", "price": "119,90 €", "compare_price": "159,60 €" } }
     ]
   }]
 }

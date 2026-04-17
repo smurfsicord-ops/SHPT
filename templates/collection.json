@@ -2,15 +2,30 @@
   "sections": {
     "collection-banner": {
       "type": "collection-banner",
-      "settings": {}
+      "settings": {
+        "custom_title": "",
+        "eyebrow_text": "Nos produits",
+        "custom_subtitle": "",
+        "show_breadcrumb": true,
+        "show_count": true,
+        "bg_color": "#f3f0ec",
+        "title_color": "#28251d",
+        "subtitle_color": "#7a7974",
+        "eyebrow_color": "#c4756a",
+        "show_image": true,
+        "overlay_opacity": 40,
+        "banner_height": "medium",
+        "text_align": "left"
+      }
     },
     "collection-products": {
       "type": "page-catalogue",
       "settings": {
         "heading": "Notre Catalogue",
-        "subheading": "Découvrez notre gamme complète de sous-vêtements Octipa.",
+        "subheading": "D\u00e9couvrez notre gamme compl\u00e8te de sous-v\u00eatements Octipa.",
         "columns": "3",
-        "use_collection": true
+        "use_collection": true,
+        "products_per_page": 12
       },
       "blocks": {}
     }

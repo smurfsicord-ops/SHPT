@@ -1,14 +1,14 @@
 {%- comment -%}
   Section: footer
   Description: Pied de page Octipa — 4 colonnes, réseaux, paiement
-  Schema: brand_name, description, socials, copyright
 {%- endcomment -%}
 
 <footer class="site-footer">
   <div class="container">
     <div class="footer-grid">
-      <div>
-        <div class="footer-brand">{{ section.settings.brand_name }}</div>
+
+      <div class="footer-col footer-col--brand">
+        <div class="footer-brand">{{ section.settings.brand_name | default: 'Octipa' }}</div>
         <p class="footer-desc">{{ section.settings.description }}</p>
         <div class="footer-socials">
           {%- if section.settings.instagram != blank -%}
@@ -28,16 +28,18 @@
           {%- endif -%}
         </div>
       </div>
-      <div>
+
+      <div class="footer-col">
         <div class="footer-col-title">Boutique</div>
         <div class="footer-links">
           <a href="{{ routes.all_products_collection_url }}">Tous les produits</a>
           <a href="{{ routes.collections_url }}">Collections</a>
-          <a href="{{ routes.collections_url }}/packs">Nos packs</a>
+          <a href="/collections/packs">Nos packs</a>
           <a href="/pages/diagnostic">Diagnostic flux</a>
         </div>
       </div>
-      <div>
+
+      <div class="footer-col">
         <div class="footer-col-title">À propos</div>
         <div class="footer-links">
           <a href="/pages/about">Notre histoire</a>
@@ -46,18 +48,21 @@
           <a href="/pages/contact">Contact</a>
         </div>
       </div>
-      <div>
+
+      <div class="footer-col">
         <div class="footer-col-title">Aide</div>
         <div class="footer-links">
           <a href="/pages/livraison">Livraison &amp; retours</a>
           <a href="/pages/faq">FAQ</a>
-          <a href="{{ routes.root_url }}policies/privacy-policy">Confidentialité</a>
+          <a href="{{ routes.root_url }}policies/privacy-policy">Confidentialit\u00e9</a>
           <a href="{{ routes.root_url }}policies/terms-of-service">CGV</a>
         </div>
       </div>
+
     </div>
+
     <div class="footer-bottom">
-      <p class="footer-copy">{{ section.settings.copyright }}</p>
+      <p class="footer-copy">{{ section.settings.copyright | default: '\u00a9 2025 Octipa. Tous droits r\u00e9serv\u00e9s.' }}</p>
       <div class="payment-icons">
         <span class="payment-icon">VISA</span>
         <span class="payment-icon">MC</span>
@@ -73,12 +78,12 @@
 {
   "name": "Pied de page",
   "settings": [
-    { "type": "text",     "id": "brand_name",  "label": "Nom de la marque", "default": "Octipa" },
-    { "type": "textarea","id": "description", "label": "Description courte", "default": "Discrétion, confort et confiance au quotidien." },
+    { "type": "text",     "id": "brand_name",  "label": "Nom de la marque",  "default": "Octipa" },
+    { "type": "textarea","id": "description", "label": "Description courte", "default": "Discr\u00e9tion, confort et confiance au quotidien." },
     { "type": "url",     "id": "instagram",   "label": "Instagram" },
     { "type": "url",     "id": "tiktok",      "label": "TikTok" },
     { "type": "url",     "id": "pinterest",   "label": "Pinterest" },
-    { "type": "text",    "id": "copyright",   "label": "Copyright", "default": "© 2025 Octipa. Tous droits réservés." }
+    { "type": "text",    "id": "copyright",   "label": "Copyright", "default": "\u00a9 2025 Octipa. Tous droits r\u00e9serv\u00e9s." }
   ]
 }
 {% endschema %}

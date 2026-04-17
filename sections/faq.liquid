@@ -1,53 +1,105 @@
-{%- assign title_parts = section.settings.title | split: '**' -%}
+{%- comment -%}
+  Section: faq
+  Description: FAQ Octipa — accordion accessible, JS Web Component
+  Schema: eyebrow, title + blocks (question/answer)
+{%- endcomment -%}
+
+{%- liquid
+  assign title_parts = section.settings.title | split: '**'
+-%}
+
 <section class="section section-bg">
   <div class="container">
     <div class="section-header fade-up">
-      <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="section-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
       <h2 class="section-title">
-        {%- for p in title_parts -%}{%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}{%- endfor -%}
+        {%- for p in title_parts -%}
+          {%- if forloop.index0 == 1 -%}<em>{{ p }}</em>{%- else -%}{{ p }}{%- endif -%}
+        {%- endfor -%}
       </h2>
       <div class="section-divider"></div>
     </div>
+
     <div class="faq-list">
       {%- for block in section.blocks -%}
         <div class="faq-item fade-up" style="transition-delay:{{ forloop.index0 | times: 60 }}ms" {{ block.shopify_attributes }}>
-          <button class="faq-btn" aria-expanded="false">
-            {{ block.settings.question }}
+          <button
+            class="faq-btn"
+            aria-expanded="false"
+            aria-controls="faq-body-{{ block.id }}"
+          >
+            <span>{{ block.settings.question }}</span>
             <svg class="faq-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+              <line x1="12" y1="5" x2="12" y2="19"/>
+              <line x1="5" y1="12" x2="19" y2="12"/>
             </svg>
           </button>
-          <div class="faq-body">{{ block.settings.answer }}</div>
+          <div
+            class="faq-body"
+            id="faq-body-{{ block.id }}"
+            role="region"
+          >
+            {{ block.settings.answer }}
+          </div>
         </div>
       {%- endfor -%}
     </div>
   </div>
 </section>
 
+{% javascript %}
+(function() {
+  document.querySelectorAll('.faq-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      var expanded = btn.getAttribute('aria-expanded') === 'true';
+      var bodyId = btn.getAttribute('aria-controls');
+      var body = document.getElementById(bodyId);
+
+      // Fermer tous les autres
+      document.querySelectorAll('.faq-btn').forEach(function(other) {
+        if (other !== btn) {
+          other.setAttribute('aria-expanded', 'false');
+          var otherId = other.getAttribute('aria-controls');
+          var otherBody = document.getElementById(otherId);
+          if (otherBody) otherBody.classList.remove('is-open');
+        }
+      });
+
+      // Toggle celui-ci
+      btn.setAttribute('aria-expanded', String(!expanded));
+      if (body) body.classList.toggle('is-open', !expanded);
+    });
+  });
+})();
+{% endjavascript %}
+
 {% schema %}
 {
   "name": "FAQ",
+  "tag": "section",
   "settings": [
-    { "type": "text", "id": "eyebrow", "label": "Accroche", "default": "Vos questions" },
-    { "type": "textarea", "id": "title", "label": "Titre (**italic**)", "default": "Questions **fréquentes**" }
+    { "type": "text",     "id": "eyebrow", "label": "Accroche",          "default": "Vos questions" },
+    { "type": "textarea","id": "title",   "label": "Titre (**italic**)", "default": "Questions **fr\u00e9quentes**" }
   ],
   "blocks": [{
     "type": "question",
     "name": "Question",
     "settings": [
-      { "type": "text", "id": "question", "label": "Question", "default": "Comment choisir mon produit ?" },
-      { "type": "textarea", "id": "answer", "label": "Réponse", "default": "Nous vous recommandons de faire notre diagnostic peau en ligne pour trouver la formule idéale." }
+      { "type": "text",     "id": "question", "label": "Question", "default": "Comment choisir mon flux d'absorption ?" },
+      { "type": "textarea","id": "answer",   "label": "R\u00e9ponse",  "default": "Notre guide en ligne vous aide \u00e0 choisir le niveau d'absorption adapt\u00e9 \u00e0 vos besoins." }
     ]
   }],
   "presets": [{
-    "name": "FAQ",
+    "name": "FAQ Octipa",
     "blocks": [
-      { "type": "question", "settings": { "question": "Comment choisir mon flux d'absorption ?", "answer": "Notre diagnostic en ligne analyse votre type de peau en 2 minutes et vous recommande le flux idéal. Flux léger pour peaux normales à mixtes, flux intense pour peaux très sèches." } },
-      { "type": "question", "settings": { "question": "Les formules sont-elles vraiment naturelles ?", "answer": "Oui, 98% de nos ingrédients sont d'origine naturelle, certifiés bio quand possible. Nos formules sont exemptes de parabènes, sulfates, colorants artificiels et parfums synthétiques." } },
-      { "type": "question", "settings": { "question": "Combien de temps avant de voir des résultats ?", "answer": "La majorité de nos clientes observent une amélioration dès la première semaine. Pour des résultats optimaux, comptez 4 à 6 semaines d'utilisation régulière." } },
-      { "type": "question", "settings": { "question": "Puis-je retourner ma commande ?", "answer": "Absolument ! Vous bénéficiez de 30 jours pour retourner tout article non ouvert. Notre service client est disponible 7j/7." } },
-      { "type": "question", "settings": { "question": "Quand est-ce que je serai livré(e) ?", "answer": "Les commandes passées avant 14h sont expédiées le jour même. Comptez 2-3 jours ouvrés pour la France métropolitaine." } },
-      { "type": "question", "settings": { "question": "Vos produits sont-ils testés dermatologiquement ?", "answer": "Tous nos produits sont testés sous contrôle dermatologique. Ils conviennent aux peaux sensibles et ont obtenu la certification hypoallergénique." } }
+      { "type": "question", "settings": { "question": "Comment choisir mon flux d'absorption ?", "answer": "Nous proposons 3 niveaux : flux l\u00e9ger, mod\u00e9r\u00e9 et intense. Pour les pertes urinaires l\u00e9g\u00e8res (quelques gouttes), choisissez le flux l\u00e9ger. Pour des pertes plus importantes, optez pour le flux intense. En cas de doute, notre quiz en ligne vous guide en 2 minutes." } },
+      { "type": "question", "settings": { "question": "Les culottes Octipa sont-elles vraiment discrètes ?", "answer": "Absolument. Nos culottes ont la coupe et l'apparence d'une culotte classique. La technologie absorbante est int\u00e9gr\u00e9e dans le tissu, invisible de l'ext\u00e9rieur. Aucune odeur, aucune sensation d'humidit\u00e9." } },
+      { "type": "question", "settings": { "question": "Comment entretenir ma culotte Octipa ?", "answer": "Lavage en machine \u00e0 30\u00b0C, sans assouplissant ni sèche-linge. Rincez \u00e0 l'eau froide avant de mettre en machine pour de meilleurs r\u00e9sultats. La culotte conserve ses propri\u00e9t\u00e9s absorb absorbantes pendant plus de 50 lavages." } },
+      { "type": "question", "settings": { "question": "Puis-je retourner ma commande ?", "answer": "Oui, vous disposez de 30 jours pour retourner tout article non port\u00e9. Notre service client est disponible 7j/7 pour vous accompagner." } },
+      { "type": "question", "settings": { "question": "Quand serai-je livr\u00e9e ?", "answer": "Les commandes pass\u00e9es avant 14h sont exp\u00e9di\u00e9es le jour m\u00eame. Comptez 2-3 jours ouvrés pour la France m\u00e9tropolitaine. Livraison offerte d\u00e8s 49\u20ac d'achat." } },
+      { "type": "question", "settings": { "question": "Quelles mati\u00e8res sont utilis\u00e9es ?", "answer": "Nos culottes sont fabriqu\u00e9es en coton bio certifi\u00e9 GOTS pour la partie au contact de la peau. La couche absorbante est compos\u00e9e de microfibre recycl\u00e9e. Aucun produit chimique irritant." } }
     ]
   }]
 }

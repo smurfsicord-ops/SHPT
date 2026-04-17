@@ -1,0 +1,36 @@
+name: Shopify Theme Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create Shopify-compatible ZIP
+        run: |
+          zip -r octipa-theme.zip assets config layout locales sections snippets templates
+          echo "✅ ZIP créé : $(du -sh octipa-theme.zip | cut -f1)"
+
+      - name: Create GitHub Release with ZIP
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Octipa Theme ${{ github.ref_name }}"
+          body: |
+            ## 🌿 Octipa Theme ${{ github.ref_name }}
+
+            ### Installation Shopify
+            1. Télécharger **octipa-theme.zip** ci-dessous
+            2. Shopify Admin → Online Store → Themes → **Add theme → Upload zip file**
+            3. Sélectionner le fichier téléchargé → **Publish**
+
+            > ⚠️ Ne pas utiliser "Source code (zip)" — utiliser uniquement **octipa-theme.zip**
+          files: octipa-theme.zip

@@ -1,107 +1,199 @@
 {%- comment -%}
   Section: collection-banner
-  Description: Bandeau haut de page collection — titre, description, image de fond
+  Description: Bandeau en-tête de collection — image + titre + description
 {%- endcomment -%}
 
 {%- liquid
-  assign banner_image = section.settings.banner_image | default: collection.image
-  assign show_desc    = section.settings.show_description
+  assign show_image       = section.settings.show_image
+  assign banner_height    = section.settings.banner_height | default: 'medium'
+  assign overlay_opacity  = section.settings.overlay_opacity | default: 40
 -%}
 
-<div class="collection-banner{% if banner_image %} collection-banner--has-image{% endif %}">
-  {%- if banner_image -%}
-    <img
-      class="collection-banner__bg"
-      src="{{ banner_image | image_url: width: 1400 }}"
-      alt="{{ collection.title | escape }}"
-      width="1400"
-      height="400"
-      loading="eager"
-      decoding="async"
-    >
-    <div class="collection-banner__overlay"></div>
+<div class="coll-banner coll-banner--{{ banner_height }}{% if collection.image == blank or show_image == false %} coll-banner--no-image{% endif %}">
+  {%- if collection.image != blank and show_image -%}
+    <div class="coll-banner__bg" aria-hidden="true">
+      <img
+        src="{{ collection.image | image_url: width: 1400 }}"
+        alt="{{ collection.title | escape }}"
+        width="1400"
+        height="400"
+        loading="eager"
+        decoding="async"
+      >
+      <div class="coll-banner__overlay" style="--opacity: {{ overlay_opacity | divided_by: 100.0 }}"></div>
+    </div>
   {%- endif -%}
-  <div class="collection-banner__content container">
-    <h1 class="collection-banner__title">{{ collection.title }}</h1>
-    {%- if show_desc and collection.description != blank -%}
-      <p class="collection-banner__desc">{{ collection.description }}</p>
+
+  <div class="coll-banner__content">
+    <nav class="coll-banner__breadcrumb" aria-label="Fil d'Ariane">
+      <ol role="list">
+        <li><a href="/">Accueil</a></li>
+        <li aria-hidden="true">›</li>
+        <li aria-current="page">{{ collection.title }}</li>
+      </ol>
+    </nav>
+    <h1 class="coll-banner__title">{{ collection.title }}</h1>
+    {%- if collection.description != blank -%}
+      <p class="coll-banner__desc">{{ collection.description }}</p>
     {%- endif -%}
+    <p class="coll-banner__count">{{ collection.products_count }} produit{% if collection.products_count > 1 %}s{% endif %}</p>
   </div>
 </div>
 
 {% stylesheet %}
-.collection-banner {
+/* ============================================================
+   COLLECTION BANNER — Octipa
+   ============================================================ */
+
+.coll-banner {
   position: relative;
-  background: var(--color-primary-highlight, #cedcd8);
-  padding-block: clamp(2rem, 4vw, 3.5rem);
+  display: flex;
+  align-items: flex-end;
   overflow: hidden;
-  text-align: center;
+  background: var(--color-surface-offset, #f3f0ec);
 }
 
-.collection-banner__bg {
+.coll-banner--small  { min-height: 180px; }
+.coll-banner--medium { min-height: 260px; }
+.coll-banner--large  { min-height: 360px; }
+.coll-banner--no-image { min-height: 140px; align-items: center; }
+
+.coll-banner__bg {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   z-index: 0;
 }
 
-.collection-banner__overlay {
+.coll-banner__bg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.coll-banner__overlay {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,.42);
-  z-index: 1;
+  background: rgba(0,0,0,var(--opacity, 0.4));
 }
 
-.collection-banner__content {
+.coll-banner__content {
   position: relative;
-  z-index: 2;
+  z-index: 1;
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding: clamp(1.5rem, 4vw, 3rem) clamp(1rem, 4vw, 2rem);
 }
 
-.collection-banner__title {
+.coll-banner--no-image .coll-banner__content {
+  text-align: center;
+}
+
+.coll-banner__breadcrumb ol {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 12px;
+  font-size: 0.8rem;
+}
+
+.coll-banner__breadcrumb a {
+  color: var(--color-text-muted, #7a7974);
+  text-decoration: none;
+}
+
+.coll-banner__breadcrumb a:hover { text-decoration: underline; }
+
+.coll-banner--no-image .coll-banner__breadcrumb { justify-content: center; }
+
+.coll-banner__title {
   font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(1.8rem, 1rem + 3vw, 3rem);
+  font-size: clamp(1.6rem, 1rem + 2.5vw, 2.8rem);
   font-weight: 700;
   line-height: 1.15;
+  margin: 0 0 10px;
   color: var(--color-text, #28251d);
 }
 
-.collection-banner--has-image .collection-banner__title {
+.coll-banner--medium .coll-banner__title,
+.coll-banner--large .coll-banner__title {
   color: #fff;
+  text-shadow: 0 2px 12px rgba(0,0,0,.3);
 }
 
-.collection-banner__desc {
-  margin-top: .75rem;
-  font-size: clamp(0.9rem, 0.85rem + 0.2vw, 1.05rem);
+.coll-banner__desc {
+  font-size: clamp(0.9rem, 0.85rem + 0.2vw, 1rem);
   color: var(--color-text-muted, #7a7974);
-  max-width: 60ch;
-  margin-inline: auto;
-  line-height: 1.65;
+  max-width: 55ch;
+  margin: 0 0 10px;
+  line-height: 1.6;
 }
 
-.collection-banner--has-image .collection-banner__desc {
+.coll-banner--medium .coll-banner__desc,
+.coll-banner--large .coll-banner__desc {
   color: rgba(255,255,255,.85);
+}
+
+.coll-banner__count {
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--color-primary, #c4756a);
+  margin: 0;
+}
+
+.coll-banner--medium .coll-banner__count,
+.coll-banner--large .coll-banner__count {
+  color: rgba(255,255,255,.7);
+}
+
+@media (min-width: 768px) {
+  .coll-banner--small  { min-height: 220px; }
+  .coll-banner--medium { min-height: 320px; }
+  .coll-banner--large  { min-height: 460px; }
 }
 {% endstylesheet %}
 
 {% schema %}
 {
   "name": "Bandeau collection",
+  "tag": "div",
   "settings": [
     {
-      "type": "image_picker",
-      "id": "banner_image",
-      "label": "Image de fond (optionnel)",
-      "info": "Laissez vide pour utiliser l'image de la collection"
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Afficher l'image de la collection",
+      "default": true
     },
     {
-      "type": "checkbox",
-      "id": "show_description",
-      "label": "Afficher la description",
-      "default": true
+      "type": "select",
+      "id": "banner_height",
+      "label": "Hauteur du bandeau",
+      "options": [
+        { "value": "small",  "label": "Petit" },
+        { "value": "medium", "label": "Moyen" },
+        { "value": "large",  "label": "Grand" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Opacité du filtre sombre",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 40
     }
   ],
-  "presets": [{"name": "Bandeau collection"}]
+  "presets": [
+    { "name": "Bandeau collection" }
+  ]
 }
 {% endschema %}

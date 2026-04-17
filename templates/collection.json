@@ -4,16 +4,16 @@
       "type": "collection-banner",
       "settings": {}
     },
-    "collection-main": {
-      "type": "collection-main",
+    "collection-products": {
+      "type": "page-catalogue",
       "settings": {
-        "products_per_page": 12,
-        "columns_desktop": 3,
-        "show_filters": true,
-        "show_sort": true,
-        "show_product_count": true
-      }
+        "heading": "Notre Catalogue",
+        "subheading": "Découvrez notre gamme complète de sous-vêtements Octipa.",
+        "columns": "3",
+        "use_collection": true
+      },
+      "blocks": {}
     }
   },
-  "order": ["collection-banner", "collection-main"]
+  "order": ["collection-banner", "collection-products"]
 }

@@ -1,59 +1,119 @@
 {%- comment -%}
   Section: page-catalogue
-  Description: Page catalogue Octipa — grille de produits ajoutables manuellement
-               depuis l'éditeur de thème (blocks)
-  Shopify 2.0 — chaque block = 1 produit sélectionnable
+  Description: Grille produits — fonctionne en mode PAGE (blocks manuels)
+               ET en mode COLLECTION (affiche tous les produits de la collection)
+  Shopify 2.0 — sections everywhere
 {%- endcomment -%}
 
 {%- liquid
-  assign heading    = section.settings.heading    | default: 'Notre Catalogue'
-  assign subheading = section.settings.subheading
-  assign columns    = section.settings.columns    | default: '3'
+  assign heading       = section.settings.heading    | default: 'Notre Catalogue'
+  assign subheading    = section.settings.subheading
+  assign columns       = section.settings.columns    | default: '3'
+  assign use_collection = section.settings.use_collection | default: false
+  assign products_per_page = section.settings.products_per_page | default: 12
+
+  if use_collection and collection != blank
+    assign source = 'collection'
+  else
+    assign source = 'blocks'
+  endif
 -%}
 
-<section class="page-catalogue">
+<section class="page-catalogue" id="page-catalogue-{{ section.id }}">
   <div class="page-catalogue__container">
 
-    {%- comment -%} EN-TÊTE {%- endcomment -%}
-    <div class="page-catalogue__header">
-      <p class="page-catalogue__eyebrow">Nos produits</p>
-      <h1 class="page-catalogue__heading">{{ heading }}</h1>
-      {%- if subheading != blank -%}
-        <p class="page-catalogue__subheading">{{ subheading }}</p>
-      {%- endif -%}
-    </div>
-
-    {%- comment -%} GRILLE PRODUITS (blocks) {%- endcomment -%}
-    {%- if section.blocks.size > 0 -%}
-      <ul class="page-catalogue__grid page-catalogue__grid--{{ columns }}" role="list">
-        {%- for block in section.blocks -%}
-          {%- assign product = block.settings.product -%}
-          {%- if product != blank -%}
-            <li {{ block.shopify_attributes }}>
-              {%- render 'card-product', product: product -%}
-            </li>
-          {%- endif -%}
-        {%- endfor -%}
-      </ul>
-    {%- else -%}
-      <div class="page-catalogue__empty">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
-        <p>Aucun produit ajouté pour l'instant.</p>
-        <span class="page-catalogue__empty-hint">Ajoutez des produits depuis l'éditeur de thème → "Ajouter un produit"</span>
+    {%- comment -%} EN-TÊTE — masqué si bandeau collection présent {%- endcomment -%}
+    {%- unless use_collection and collection != blank -%}
+      <div class="page-catalogue__header">
+        <p class="page-catalogue__eyebrow">Nos produits</p>
+        <h1 class="page-catalogue__heading">{{ heading }}</h1>
+        {%- if subheading != blank -%}
+          <p class="page-catalogue__subheading">{{ subheading }}</p>
+        {%- endif -%}
       </div>
+    {%- endunless -%}
+
+    {%- comment -%} BARRE TRI + FILTRE {%- endcomment -%}
+    {%- if source == 'collection' -%}
+      <div class="page-catalogue__toolbar">
+        <span class="page-catalogue__count">
+          {{ collection.products_count }} produit{% if collection.products_count > 1 %}s{% endif %}
+        </span>
+        <div class="page-catalogue__sort">
+          <label for="sort-{{ section.id }}" class="sr-only">Trier par</label>
+          <select id="sort-{{ section.id }}" class="sort-select" data-sort-select>
+            {%- assign sort_by = collection.sort_by | default: collection.default_sort_by -%}
+            {%- for option in collection.sort_options -%}
+              <option
+                value="{{ option.value }}"
+                {% if option.value == sort_by %}selected{% endif %}
+              >{{ option.name }}</option>
+            {%- endfor -%}
+          </select>
+        </div>
+      </div>
+    {%- endif -%}
+
+    {%- comment -%} GRILLE PRODUITS {%- endcomment -%}
+    {%- if source == 'collection' -%}
+      {%- paginate collection.products by products_per_page -%}
+        {%- if collection.products.size > 0 -%}
+          <ul class="page-catalogue__grid page-catalogue__grid--{{ columns }}" role="list" id="product-grid">
+            {%- for product in collection.products -%}
+              <li>
+                {%- render 'card-product', product: product -%}
+              </li>
+            {%- endfor -%}
+          </ul>
+
+          {%- if paginate.pages > 1 -%}
+            <nav class="page-catalogue__pagination" aria-label="Pagination">
+              {%- if paginate.previous -%}
+                <a href="{{ paginate.previous.url }}" class="pagination-btn" aria-label="Page précédente">← Précédent</a>
+              {%- endif -%}
+              <span class="pagination-info">Page {{ paginate.current_page }} / {{ paginate.pages }}</span>
+              {%- if paginate.next -%}
+                <a href="{{ paginate.next.url }}" class="pagination-btn" aria-label="Page suivante">Suivant →</a>
+              {%- endif -%}
+            </nav>
+          {%- endif -%}
+        {%- else -%}
+          <div class="page-catalogue__empty">
+            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+            <p>Aucun produit dans cette collection.</p>
+          </div>
+        {%- endif -%}
+      {%- endpaginate -%}
+
+    {%- else -%}
+      {%- comment -%} MODE PAGE — blocks manuels {%- endcomment -%}
+      {%- if section.blocks.size > 0 -%}
+        <ul class="page-catalogue__grid page-catalogue__grid--{{ columns }}" role="list">
+          {%- for block in section.blocks -%}
+            {%- assign product = block.settings.product -%}
+            {%- if product != blank -%}
+              <li {{ block.shopify_attributes }}>
+                {%- render 'card-product', product: product -%}
+              </li>
+            {%- endif -%}
+          {%- endfor -%}
+        </ul>
+      {%- else -%}
+        <div class="page-catalogue__empty">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3"><path d="M20 7H4a2 2 0 00-2 2v10a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2z"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>
+          <p>Aucun produit ajouté pour l'instant.</p>
+          <span class="page-catalogue__empty-hint">Ajoutez des produits depuis l'éditeur → "Ajouter un bloc"</span>
+        </div>
+      {%- endif -%}
     {%- endif -%}
 
   </div>
 </section>
 
 {% stylesheet %}
-/* ============================================================
-   PAGE CATALOGUE — Octipa
-   ============================================================ */
-
 .page-catalogue {
-  padding-block: clamp(3rem, 6vw, 6rem);
-  background: var(--color-bg, #f7f6f2);
+  padding-block: clamp(2rem, 5vw, 4rem);
+  background: var(--color-bg, #faf8f6);
 }
 
 .page-catalogue__container {
@@ -65,16 +125,16 @@
 /* HEADER */
 .page-catalogue__header {
   text-align: center;
-  margin-bottom: clamp(2rem, 4vw, 3.5rem);
+  margin-bottom: clamp(2rem, 4vw, 3rem);
 }
 
 .page-catalogue__eyebrow {
-  font-size: clamp(0.7rem, 0.65rem + 0.2vw, 0.8rem);
+  font-size: 0.75rem;
   font-weight: 700;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: var(--color-primary, #01696f);
-  margin-bottom: .75rem;
+  color: var(--color-primary, #c4756a);
+  margin-bottom: .6rem;
 }
 
 .page-catalogue__heading {
@@ -83,29 +143,108 @@
   font-weight: 700;
   color: var(--color-text, #28251d);
   line-height: 1.15;
-  margin-bottom: 1rem;
+  margin-bottom: .8rem;
 }
 
 .page-catalogue__subheading {
-  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.1rem);
+  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
   color: var(--color-text-muted, #7a7974);
   max-width: 55ch;
   margin-inline: auto;
   line-height: 1.65;
 }
 
+/* TOOLBAR */
+.page-catalogue__toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--color-border, #e8e4de);
+}
+
+.page-catalogue__count {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #7a7974);
+  font-weight: 500;
+}
+
+.sort-select {
+  appearance: none;
+  -webkit-appearance: none;
+  background: var(--color-surface, #fff) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%237a7974' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center;
+  border: 1px solid var(--color-border, #e8e4de);
+  border-radius: 8px;
+  padding: 8px 36px 8px 14px;
+  font-size: 0.875rem;
+  color: var(--color-text, #28251d);
+  cursor: pointer;
+  transition: border-color 150ms ease;
+}
+
+.sort-select:hover,
+.sort-select:focus-visible {
+  border-color: var(--color-primary, #c4756a);
+  outline: none;
+}
+
 /* GRID */
 .page-catalogue__grid {
   display: grid;
   list-style: none;
+  padding: 0;
+  margin: 0;
   gap: clamp(1rem, 2vw, 1.5rem);
   grid-template-columns: repeat(2, 1fr);
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
+  .page-catalogue__grid--2 { grid-template-columns: repeat(2, 1fr); }
+  .page-catalogue__grid--3 { grid-template-columns: repeat(3, 1fr); }
+  .page-catalogue__grid--4 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 1024px) {
   .page-catalogue__grid--2 { grid-template-columns: repeat(2, 1fr); }
   .page-catalogue__grid--3 { grid-template-columns: repeat(3, 1fr); }
   .page-catalogue__grid--4 { grid-template-columns: repeat(4, 1fr); }
+}
+
+/* PAGINATION */
+.page-catalogue__pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: clamp(2rem, 4vw, 3rem);
+}
+
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid var(--color-border, #e8e4de);
+  background: var(--color-surface, #fff);
+  color: var(--color-text, #28251d);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: border-color 150ms ease, background 150ms ease;
+}
+
+.pagination-btn:hover {
+  border-color: var(--color-primary, #c4756a);
+  background: var(--color-primary, #c4756a);
+  color: #fff;
+}
+
+.pagination-info {
+  font-size: 0.85rem;
+  color: var(--color-text-muted, #7a7974);
 }
 
 /* EMPTY */
@@ -114,12 +253,12 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: 14px;
+  gap: 12px;
   padding: 80px 20px;
   color: var(--color-text-muted, #7a7974);
   background: #fff;
   border-radius: 16px;
-  border: 2px dashed var(--color-border, #d4d1ca);
+  border: 2px dashed var(--color-border, #e8e4de);
 }
 
 .page-catalogue__empty p {
@@ -134,24 +273,48 @@
   color: var(--color-text-muted, #7a7974);
   max-width: 36ch;
 }
+
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border-width: 0;
+}
 {% endstylesheet %}
+
+{% javascript %}
+// Sort select — recharge la page avec le tri sélectionné
+document.querySelectorAll('[data-sort-select]').forEach(function(select) {
+  select.addEventListener('change', function() {
+    var url = new URL(window.location.href);
+    url.searchParams.set('sort_by', this.value);
+    window.location.href = url.toString();
+  });
+});
+{% endjavascript %}
 
 {% schema %}
 {
-  "name": "Page Catalogue",
+  "name": "Grille Catalogue",
   "tag": "section",
   "class": "section-page-catalogue",
   "settings": [
     {
+      "type": "checkbox",
+      "id": "use_collection",
+      "label": "Afficher les produits de la collection automatiquement",
+      "info": "Si activé, affiche tous les produits de la collection sans besoin de les ajouter manuellement.",
+      "default": true
+    },
+    {
       "type": "text",
       "id": "heading",
-      "label": "Titre de la page",
+      "label": "Titre (mode page uniquement)",
       "default": "Notre Catalogue"
     },
     {
       "type": "textarea",
       "id": "subheading",
-      "label": "Sous-titre",
+      "label": "Sous-titre (mode page uniquement)",
       "default": "D\u00e9couvrez notre gamme compl\u00e8te de sous-v\u00eatements Octipa."
     },
     {
@@ -164,26 +327,32 @@
         { "value": "4", "label": "4 colonnes" }
       ],
       "default": "3"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "Produits par page",
+      "min": 6,
+      "max": 48,
+      "step": 6,
+      "default": 12
     }
   ],
   "blocks": [
     {
       "type": "product",
-      "name": "Produit",
+      "name": "Produit (mode manuel)",
       "settings": [
         {
           "type": "product",
           "id": "product",
-          "label": "S\u00e9lectionner un produit"
+          "label": "Sélectionner un produit"
         }
       ]
     }
   ],
   "presets": [
-    {
-      "name": "Page Catalogue",
-      "blocks": []
-    }
+    { "name": "Grille Catalogue" }
   ]
 }
 {% endschema %}

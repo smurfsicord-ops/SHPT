@@ -1,6 +1,6 @@
 {%- comment -%}
   Template: cart — Page panier Octipa
-  Upsell : variante "-20%" hardcodée (ID: 64250157826397)
+  Upsell : variante -20% (ID: 64250157826397) — prix normal 20€ / prix réduit 16€
 {%- endcomment -%}
 
 <section class="section">
@@ -72,10 +72,6 @@
       -%}
 
       {%- if upsell_product != nil -%}
-        {%- assign upsell_variant_id = 64250157826397 -%}
-        {%- assign upsell_normal_price = upsell_product.price -%}
-        {%- assign upsell_discounted_price = upsell_product.price | times: 0.8 -%}
-
         <div class="octi-upsell" id="octi-upsell">
           <div class="octi-upsell__header">
             <span class="octi-upsell__badge">✦ Offre exclusive — -20%</span>
@@ -88,8 +84,8 @@
             <div class="octi-upsell__info">
               <p class="octi-upsell__title">{{ upsell_product.title }}</p>
               <div class="octi-upsell__prices">
-                <span class="octi-upsell__price-old">{{ upsell_normal_price | money }}</span>
-                <span class="octi-upsell__price-new">{{ upsell_discounted_price | money }}</span>
+                <span class="octi-upsell__price-old">20,00 €</span>
+                <span class="octi-upsell__price-new">16,00 €</span>
                 <span class="octi-upsell__badge-pct">-20%</span>
               </div>
               {%- if upsell_product.description != blank -%}
@@ -98,9 +94,9 @@
             </div>
             <div class="octi-upsell__action">
               <form action="/cart/add" method="post">
-                <input type="hidden" name="id" value="{{ upsell_variant_id }}">
+                <input type="hidden" name="id" value="64250157826397">
                 <input type="hidden" name="quantity" value="1">
-                <button type="submit" class="octi-upsell__btn">Ajouter — {{ upsell_discounted_price | money }}</button>
+                <button type="submit" class="octi-upsell__btn">Ajouter — 16,00 €</button>
               </form>
             </div>
           </div>

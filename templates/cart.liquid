@@ -1,46 +1,82 @@
 {%- comment -%}
   Template: cart
   Description: Page panier complète Octipa
+  Fix: bouton Commander via <form> POST natif Shopify au lieu de <a href>
 {%- endcomment -%}
 
 <section class="section">
   <div class="container container--narrow">
     <h1 class="section-title" style="margin-bottom:2rem">Mon panier</h1>
+
     {%- if cart.item_count == 0 -%}
       <div style="text-align:center;padding:4rem 0;color:var(--color-text-muted)">
         <p style="margin-bottom:1.5rem">Votre panier est vide.</p>
         <a href="{{ routes.all_products_collection_url }}" class="btn btn--primary btn--lg">Continuer mes achats</a>
       </div>
+
     {%- else -%}
-      {%- for item in cart.items -%}
-        <div class="cart-item">
-          {{- item.image
-            | image_url: width: 160
-            | image_tag:
-              loading: 'lazy',
-              width: 80,
-              height: 100,
-              alt: item.title | escape
-          -}}
-          <div>
-            <div class="cart-item-name">{{ item.product.title }}</div>
-            {%- unless item.variant.title == 'Default Title' -%}
-              <div class="cart-item-variant">{{ item.variant.title }}</div>
-            {%- endunless -%}
-            <div class="cart-item-price">{{ item.final_line_price | money }}</div>
+      <form action="{{ routes.cart_url }}" method="post" novalidate>
+
+        {%- for item in cart.items -%}
+          <div class="cart-item">
+            {{- item.image
+              | image_url: width: 160
+              | image_tag:
+                loading: 'lazy',
+                width: 80,
+                height: 100,
+                alt: item.title | escape
+            -}}
+            <div style="flex:1">
+              <div class="cart-item-name">{{ item.product.title }}</div>
+              {%- unless item.variant.title == 'Default Title' -%}
+                <div class="cart-item-variant">{{ item.variant.title }}</div>
+              {%- endunless -%}
+              <div class="cart-item-price">{{ item.final_line_price | money }}</div>
+              <div style="margin-top:.5rem;display:flex;align-items:center;gap:.5rem">
+                <label for="qty-{{ item.key }}" class="sr-only">Quantité</label>
+                <input
+                  type="number"
+                  id="qty-{{ item.key }}"
+                  name="updates[]"
+                  value="{{ item.quantity }}"
+                  min="0"
+                  style="width:56px;padding:4px 8px;border:1px solid var(--color-border,#d4d1ca);border-radius:6px;font-size:.9rem;text-align:center"
+                >
+              </div>
+            </div>
+            <a
+              href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity=0"
+              class="cart-item-remove"
+              aria-label="Supprimer {{ item.product.title | escape }}"
+            >&#215;</a>
           </div>
-          <a
-            href="{{ routes.cart_change_url }}?line={{ forloop.index }}&quantity=0"
-            class="cart-item-remove"
-            aria-label="Supprimer {{ item.product.title | escape }}"
-          >&#215;</a>
+        {%- endfor -%}
+
+        <div style="border-top:1px solid var(--color-divider);padding-top:1.5rem;margin-top:1rem;text-align:right">
+          <p style="font-size:var(--text-lg);font-weight:700;margin-bottom:.5rem">Total : {{ cart.total_price | money }}</p>
+          <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:1.5rem">✓ Livraison offerte dès 49€</p>
+
+          <div style="display:flex;gap:1rem;justify-content:flex-end;flex-wrap:wrap">
+            <button
+              type="submit"
+              name="update"
+              class="btn btn--secondary"
+              style="font-size:.875rem"
+            >
+              Mettre à jour
+            </button>
+            <button
+              type="submit"
+              name="checkout"
+              class="btn btn--primary btn--lg"
+            >
+              Commander →
+            </button>
+          </div>
         </div>
-      {%- endfor -%}
-      <div style="border-top:1px solid var(--color-divider);padding-top:1.5rem;margin-top:1rem;text-align:right">
-        <p style="font-size:var(--text-lg);font-weight:700;margin-bottom:1rem">Total : {{ cart.total_price | money }}</p>
-        <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:1.5rem">✓ Livraison offerte dès 49€</p>
-        <a href="/checkout" class="btn btn--primary btn--lg">Commander →</a>
-      </div>
+
+      </form>
     {%- endif -%}
   </div>
 </section>

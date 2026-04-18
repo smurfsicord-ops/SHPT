@@ -1,6 +1,38 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "current": {
     "color_primary": "#c4756a",
-    "color_bg": "#faf8f6"
+    "color_bg": "#faf8f6",
+    "sections": {
+      "header": {
+        "type": "header",
+        "settings": {
+          "logo_width": 140,
+          "menu": "main-menu",
+          "show_account": false,
+          "sticky_header": true
+        }
+      },
+      "footer": {
+        "type": "footer",
+        "settings": {
+          "brand_name": "Octipa",
+          "description": "Discrétion, confort et confiance au quotidien.",
+          "instagram": "",
+          "tiktok": "",
+          "pinterest": "",
+          "copyright": "© 2025 Octipa. Tous droits réservés."
+        }
+      }
+    },
+    "content_for_index": []
   }
 }

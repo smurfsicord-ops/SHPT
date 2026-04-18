@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "sections": {
     "collection-banner": {
@@ -6,10 +15,10 @@
         "custom_title": "",
         "eyebrow_text": "Nos produits",
         "custom_subtitle": "",
-        "show_breadcrumb": true,
-        "show_count": true,
+        "show_breadcrumb": false,
+        "show_count": false,
         "bg_color": "#f3f0ec",
-        "title_color": "#28251d",
+        "title_color": "#c4756a",
         "subtitle_color": "#7a7974",
         "eyebrow_color": "#c4756a",
         "show_image": true,
@@ -21,14 +30,16 @@
     "collection-products": {
       "type": "page-catalogue",
       "settings": {
-        "heading": "Notre Catalogue",
-        "subheading": "D\u00e9couvrez notre gamme compl\u00e8te de sous-v\u00eatements Octipa.",
-        "columns": "3",
         "use_collection": true,
+        "heading": "Notre Catalogue",
+        "subheading": "Découvrez notre gamme complète de sous-vêtements Octipa.",
+        "columns": "3",
         "products_per_page": 12
-      },
-      "blocks": {}
+      }
     }
   },
-  "order": ["collection-banner", "collection-products"]
+  "order": [
+    "collection-banner",
+    "collection-products"
+  ]
 }

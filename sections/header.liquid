@@ -18,7 +18,6 @@
 >
   <div class="site-header__inner container">
 
-    {%- comment -%} HAMBURGER MOBILE {%- endcomment -%}
     <button
       class="site-header__hamburger"
       aria-label="Ouvrir le menu"
@@ -31,7 +30,6 @@
       <span class="hamburger-line"></span>
     </button>
 
-    {%- comment -%} LOGO {%- endcomment -%}
     <a href="{{ routes.root_url }}" class="site-header__logo" aria-label="{{ shop.name }} — Accueil">
       {%- if logo != blank -%}
         <img
@@ -47,7 +45,6 @@
       {%- endif -%}
     </a>
 
-    {%- comment -%} NAV DESKTOP {%- endcomment -%}
     <nav class="site-header__nav" aria-label="Navigation principale">
       <ul class="site-header__nav-list" role="list">
         {%- for link in linklists[main_menu].links -%}
@@ -75,13 +72,16 @@
             {%- endif -%}
           </li>
         {%- endfor -%}
+
+        <li class="site-header__nav-item">
+          <a href="/pages/diagnostic" class="site-header__nav-link{% if request.path contains '/pages/diagnostic' %} is-active{% endif %} site-header__nav-link--diagnostic">
+            Diagnostic
+          </a>
+        </li>
       </ul>
     </nav>
 
-    {%- comment -%} ICÔNES DROITE {%- endcomment -%}
     <div class="site-header__actions">
-
-      {%- comment -%} Recherche {%- endcomment -%}
       <button class="site-header__icon-btn" aria-label="Rechercher" data-search-open>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <circle cx="11" cy="11" r="8"/>
@@ -89,7 +89,6 @@
         </svg>
       </button>
 
-      {%- comment -%} Compte {%- endcomment -%}
       {%- if section.settings.show_account -%}
         <a href="{{ routes.account_url }}" class="site-header__icon-btn" aria-label="Mon compte">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
@@ -99,7 +98,6 @@
         </a>
       {%- endif -%}
 
-      {%- comment -%} Panier {%- endcomment -%}
       <button class="site-header__icon-btn site-header__cart-btn" aria-label="Panier ({{ cart.item_count }} article{% if cart.item_count != 1 %}s{% endif %})" data-cart-open>
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true">
           <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
@@ -110,11 +108,9 @@
           <span class="cart-badge" aria-hidden="true">{{ cart.item_count }}</span>
         {%- endif -%}
       </button>
-
     </div>
   </div>
 
-  {%- comment -%} NAV MOBILE {%- endcomment -%}
   <div class="mobile-nav" id="mobile-nav" aria-hidden="true">
     <div class="mobile-nav__overlay" data-nav-close></div>
     <nav class="mobile-nav__panel" aria-label="Navigation mobile">
@@ -138,6 +134,9 @@
             {%- endif -%}
           </li>
         {%- endfor -%}
+        <li class="mobile-nav__item">
+          <a href="/pages/diagnostic" class="mobile-nav__link{% if request.path contains '/pages/diagnostic' %} is-active{% endif %}">Diagnostic</a>
+        </li>
       </ul>
       <div class="mobile-nav__footer">
         <a href="{{ routes.account_url }}" class="btn btn--ghost" style="width:100%">Mon compte</a>
@@ -147,10 +146,6 @@
 </site-header>
 
 {% stylesheet %}
-/* ============================================================
-   SITE HEADER — Octipa
-   ============================================================ */
-
 .site-header {
   position: relative;
   z-index: 100;
@@ -159,41 +154,33 @@
   border-bottom: 1px solid var(--color-divider);
   transition: background var(--transition-slow), box-shadow var(--transition-slow);
 }
-
 .site-header--sticky {
   position: sticky;
   top: 0;
 }
-
 .site-header.is-scrolled {
   box-shadow: var(--shadow-md);
 }
-
 .site-header.is-transparent {
   background: transparent;
   border-bottom-color: transparent;
 }
-
 .site-header.is-transparent .site-header__nav-link,
 .site-header.is-transparent .site-header__icon-btn,
 .site-header.is-transparent .site-header__logo-text {
   color: #fff;
 }
-
 .site-header__inner {
   display: flex;
   align-items: center;
   gap: var(--space-4);
   height: var(--header-height);
 }
-
-/* --- LOGO --- */
 .site-header__logo {
   flex-shrink: 0;
   display: flex;
   align-items: center;
 }
-
 .site-header__logo-text {
   font-family: var(--font-display);
   font-size: var(--text-xl);
@@ -202,32 +189,25 @@
   letter-spacing: -.02em;
   transition: color var(--transition-fast);
 }
-
 .site-header__logo:hover .site-header__logo-text {
   color: var(--color-primary-hover);
 }
-
-/* --- NAV DESKTOP --- */
 .site-header__nav {
   flex: 1;
   display: none;
 }
-
 @media (min-width: 1024px) {
   .site-header__nav { display: flex; justify-content: center; }
 }
-
 .site-header__nav-list {
   display: flex;
   align-items: center;
   gap: var(--space-1);
   list-style: none;
 }
-
 .site-header__nav-item {
   position: relative;
 }
-
 .site-header__nav-link {
   display: inline-flex;
   align-items: center;
@@ -240,23 +220,28 @@
   transition: background var(--transition-fast), color var(--transition-fast);
   white-space: nowrap;
 }
-
 .site-header__nav-link:hover,
 .site-header__nav-link.is-active {
   background: var(--color-primary-highlight);
   color: var(--color-primary);
 }
-
+.site-header__nav-link--diagnostic {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+  font-weight: 700;
+}
+.site-header__nav-link--diagnostic:hover,
+.site-header__nav-link--diagnostic.is-active {
+  background: var(--color-primary);
+  color: #fff;
+}
 .nav-chevron {
   transition: transform var(--transition-fast);
 }
-
 .has-dropdown:hover .nav-chevron,
 .has-dropdown:focus-within .nav-chevron {
   transform: rotate(180deg);
 }
-
-/* Dropdown */
 .site-header__dropdown {
   position: absolute;
   top: calc(100% + 8px);
@@ -271,19 +256,15 @@
   list-style: none;
   opacity: 0;
   pointer-events: none;
-  transition:
-    opacity var(--transition-fast),
-    transform var(--transition-fast);
+  transition: opacity var(--transition-fast), transform var(--transition-fast);
   z-index: 10;
 }
-
 .has-dropdown:hover .site-header__dropdown,
 .has-dropdown:focus-within .site-header__dropdown {
   opacity: 1;
   pointer-events: auto;
   transform: translateX(-50%) translateY(0);
 }
-
 .site-header__dropdown-link {
   display: block;
   padding: var(--space-2) var(--space-3);
@@ -292,20 +273,16 @@
   border-radius: var(--radius-md);
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-
 .site-header__dropdown-link:hover {
   background: var(--color-primary-highlight);
   color: var(--color-primary);
 }
-
-/* --- ACTIONS (icônes droite) --- */
 .site-header__actions {
   display: flex;
   align-items: center;
   gap: var(--space-1);
   margin-left: auto;
 }
-
 .site-header__icon-btn {
   position: relative;
   display: flex;
@@ -317,12 +294,10 @@
   color: var(--color-text);
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-
 .site-header__icon-btn:hover {
   background: var(--color-surface-offset);
   color: var(--color-primary);
 }
-
 .cart-badge {
   position: absolute;
   top: 4px;
@@ -339,8 +314,6 @@
   text-align: center;
   pointer-events: none;
 }
-
-/* --- HAMBURGER --- */
 .site-header__hamburger {
   display: flex;
   flex-direction: column;
@@ -354,15 +327,12 @@
   transition: background var(--transition-fast);
   flex-shrink: 0;
 }
-
 .site-header__hamburger:hover {
   background: var(--color-surface-offset);
 }
-
 @media (min-width: 1024px) {
   .site-header__hamburger { display: none; }
 }
-
 .hamburger-line {
   display: block;
   width: 100%;
@@ -372,7 +342,6 @@
   transform-origin: center;
   transition: transform var(--transition-interactive), opacity var(--transition-fast);
 }
-
 .site-header__hamburger[aria-expanded="true"] .hamburger-line:nth-child(1) {
   transform: translateY(7px) rotate(45deg);
 }
@@ -383,19 +352,15 @@
 .site-header__hamburger[aria-expanded="true"] .hamburger-line:nth-child(3) {
   transform: translateY(-7px) rotate(-45deg);
 }
-
-/* --- MOBILE NAV --- */
 .mobile-nav {
   display: none;
   position: fixed;
   inset: 0;
   z-index: 200;
 }
-
 .mobile-nav.is-open {
   display: block;
 }
-
 .mobile-nav__overlay {
   position: absolute;
   inset: 0;
@@ -403,9 +368,7 @@
   backdrop-filter: blur(2px);
   animation: fadeIn 250ms ease forwards;
 }
-
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
 .mobile-nav__panel {
   position: absolute;
   top: 0;
@@ -420,12 +383,10 @@
   animation: slideIn 280ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
   box-shadow: var(--shadow-lg);
 }
-
 @keyframes slideIn {
   from { transform: translateX(-100%); }
   to   { transform: translateX(0); }
 }
-
 .mobile-nav__close {
   align-self: flex-end;
   display: flex;
@@ -438,11 +399,9 @@
   margin-bottom: var(--space-6);
   transition: background var(--transition-fast);
 }
-
 .mobile-nav__close:hover {
   background: var(--color-surface-offset);
 }
-
 .mobile-nav__list {
   flex: 1;
   list-style: none;
@@ -450,7 +409,6 @@
   flex-direction: column;
   gap: var(--space-1);
 }
-
 .mobile-nav__link {
   display: block;
   padding: var(--space-3) var(--space-2);
@@ -460,19 +418,16 @@
   border-radius: var(--radius-md);
   transition: background var(--transition-fast), color var(--transition-fast);
 }
-
 .mobile-nav__link:hover,
 .mobile-nav__link.is-active {
   background: var(--color-primary-highlight);
   color: var(--color-primary);
 }
-
 .mobile-nav__sub {
   list-style: none;
   padding-left: var(--space-4);
   margin-top: var(--space-1);
 }
-
 .mobile-nav__sub-link {
   display: block;
   padding: var(--space-2) var(--space-2);
@@ -481,9 +436,7 @@
   border-radius: var(--radius-sm);
   transition: color var(--transition-fast);
 }
-
 .mobile-nav__sub-link:hover { color: var(--color-primary); }
-
 .mobile-nav__footer {
   padding-top: var(--space-6);
   border-top: 1px solid var(--color-divider);
@@ -492,32 +445,23 @@
 {% endstylesheet %}
 
 {% javascript %}
-/* ============================================================
-   SITE HEADER Web Component — Octipa
-   Sticky scroll + Mobile Nav
-   ============================================================ */
-
 class SiteHeader extends HTMLElement {
   connectedCallback() {
     this._sticky = this.dataset.sticky === 'true';
     this._hamburger = this.querySelector('[data-hamburger]');
     this._mobileNav = this.querySelector('.mobile-nav');
     this._closeEls  = this.querySelectorAll('[data-nav-close]');
-
     if (this._hamburger) {
       this._hamburger.addEventListener('click', this._openNav.bind(this));
     }
     this._closeEls.forEach(el => el.addEventListener('click', this._closeNav.bind(this)));
-
     if (this._sticky) {
       this._initScroll();
     }
-
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') this._closeNav();
     });
   }
-
   _initScroll() {
     const onScroll = () => {
       const scrolled = window.scrollY > 10;
@@ -526,18 +470,14 @@ class SiteHeader extends HTMLElement {
     window.addEventListener('scroll', onScroll, { passive: true });
     onScroll();
   }
-
   _openNav() {
     this._mobileNav.classList.add('is-open');
     this._mobileNav.setAttribute('aria-hidden', 'false');
     this._hamburger.setAttribute('aria-expanded', 'true');
     document.body.style.overflow = 'hidden';
-
-    // Focus trap — premier lien
     const firstLink = this._mobileNav.querySelector('a, button');
     if (firstLink) firstLink.focus();
   }
-
   _closeNav() {
     this._mobileNav.classList.remove('is-open');
     this._mobileNav.setAttribute('aria-hidden', 'true');
@@ -548,7 +488,6 @@ class SiteHeader extends HTMLElement {
     document.body.style.overflow = '';
   }
 }
-
 if (!customElements.get('site-header')) {
   customElements.define('site-header', SiteHeader);
 }

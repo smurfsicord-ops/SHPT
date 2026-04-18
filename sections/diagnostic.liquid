@@ -1,433 +1,395 @@
 {%- comment -%}
   Section: diagnostic
-  Quiz autonome — 5 étapes, résultats personnalisés
+  Diagnostic personnalisé Octipa — quiz autonome avec recommandation finale
 {%- endcomment -%}
 
-<section class="diag" id="diagnostic">
-  <div class="diag__container">
-
-    <!-- INTRO -->
-    <div class="diag__screen" id="screen-intro">
-      <p class="diag__eyebrow">Outil gratuit</p>
-      <h1 class="diag__title">Trouvez votre culotte <em>idéale</em></h1>
-      <p class="diag__subtitle">5 questions · 2 minutes · Résultat personnalisé</p>
-      <button class="diag__btn diag__btn--primary" onclick="diagStart()">Commencer le diagnostic →</button>
+<section class="octi-diagnostic" id="octi-diagnostic">
+  <div class="octi-diagnostic__container page-width">
+    <div class="octi-diagnostic__intro" id="diag-intro">
+      <span class="octi-diagnostic__kicker">Diagnostic personnalisé</span>
+      <h1 class="octi-diagnostic__title">Trouvez la culotte <em>faite pour vous</em></h1>
+      <p class="octi-diagnostic__lead">Répondez à 5 questions et découvrez en moins de 2 minutes le modèle Octipa le plus adapté à votre quotidien, votre niveau de flux et vos priorités.</p>
+      <div class="octi-diagnostic__intro-points">
+        <span>✓ 100% gratuit</span>
+        <span>✓ Rapide</span>
+        <span>✓ Recommandation claire</span>
+      </div>
+      <button class="octi-diagnostic__cta" type="button" onclick="octiDiag.start()">Commencer le diagnostic</button>
     </div>
 
-    <!-- QUIZ -->
-    <div class="diag__screen diag__screen--hidden" id="screen-quiz">
-
-      <!-- Barre de progression -->
-      <div class="diag__progress">
-        <div class="diag__progress-bar" id="progress-bar"></div>
-      </div>
-      <p class="diag__step-label" id="step-label">Question 1 / 5</p>
-
-      <!-- Questions -->
-      <div class="diag__question" id="q1">
-        <h2 class="diag__q-title">Quel est votre usage principal ?</h2>
-        <div class="diag__options">
-          <button class="diag__option" onclick="diagAnswer('q1','sport')">🏃 Sport & activité physique</button>
-          <button class="diag__option" onclick="diagAnswer('q1','daily')">💼 Quotidien & travail</button>
-          <button class="diag__option" onclick="diagAnswer('q1','night')">🌙 Protection nocturne</button>
-          <button class="diag__option" onclick="diagAnswer('q1','travel')">✈️ Voyages & sorties</button>
+    <div class="octi-diagnostic__quiz is-hidden" id="diag-quiz">
+      <div class="octi-diagnostic__topbar">
+        <p class="octi-diagnostic__step" id="diag-step-text">Question 1 sur 5</p>
+        <div class="octi-diagnostic__progress">
+          <div class="octi-diagnostic__progress-bar" id="diag-progress-bar" style="width: 20%;"></div>
         </div>
       </div>
 
-      <div class="diag__question diag__question--hidden" id="q2">
-        <h2 class="diag__q-title">Quelle est votre priorité absolue ?</h2>
-        <div class="diag__options">
-          <button class="diag__option" onclick="diagAnswer('q2','absorption')">💧 Absorption maximale</button>
-          <button class="diag__option" onclick="diagAnswer('q2','discretion')">👗 Discrétion sous les vêtements</button>
-          <button class="diag__option" onclick="diagAnswer('q2','comfort')">🌸 Confort et douceur</button>
-          <button class="diag__option" onclick="diagAnswer('q2','style')">✨ Style et élégance</button>
+      <div class="octi-question" data-question="0">
+        <h2 class="octi-question__title">Dans quelle situation porterez-vous surtout votre culotte anti-fuite ?</h2>
+        <div class="octi-question__answers">
+          <button type="button" onclick="octiDiag.answer('usage','daily')">Au quotidien</button>
+          <button type="button" onclick="octiDiag.answer('usage','night')">La nuit</button>
+          <button type="button" onclick="octiDiag.answer('usage','sport')">Pendant le sport</button>
+          <button type="button" onclick="octiDiag.answer('usage','mixed')">Un peu pour tout</button>
         </div>
       </div>
 
-      <div class="diag__question diag__question--hidden" id="q3">
-        <h2 class="diag__q-title">Comment décrivez-vous votre flux ?</h2>
-        <div class="diag__options">
-          <button class="diag__option" onclick="diagAnswer('q3','light')">🟢 Léger — quelques gouttes</button>
-          <button class="diag__option" onclick="diagAnswer('q3','moderate')">🟡 Modéré — fuites régulières</button>
-          <button class="diag__option" onclick="diagAnswer('q3','heavy')">🔴 Abondant — protection totale</button>
-          <button class="diag__option" onclick="diagAnswer('q3','variable')">🔄 Variable selon les jours</button>
+      <div class="octi-question is-hidden" data-question="1">
+        <h2 class="octi-question__title">Quel niveau de protection recherchez-vous ?</h2>
+        <div class="octi-question__answers">
+          <button type="button" onclick="octiDiag.answer('flow','light')">Léger</button>
+          <button type="button" onclick="octiDiag.answer('flow','medium')">Modéré</button>
+          <button type="button" onclick="octiDiag.answer('flow','heavy')">Élevé</button>
+          <button type="button" onclick="octiDiag.answer('flow','variable')">Variable selon les jours</button>
         </div>
       </div>
 
-      <div class="diag__question diag__question--hidden" id="q4">
-        <h2 class="diag__q-title">Quelle matière préférez-vous ?</h2>
-        <div class="diag__options">
-          <button class="diag__option" onclick="diagAnswer('q4','cotton')">🌿 Coton naturel</button>
-          <button class="diag__option" onclick="diagAnswer('q4','microfiber')">⚡ Microfibre légère</button>
-          <button class="diag__option" onclick="diagAnswer('q4','bamboo')">🎋 Bambou doux</button>
-          <button class="diag__option" onclick="diagAnswer('q4','technical')">🔬 Technique haute performance</button>
+      <div class="octi-question is-hidden" data-question="2">
+        <h2 class="octi-question__title">Quelle qualité compte le plus pour vous ?</h2>
+        <div class="octi-question__answers">
+          <button type="button" onclick="octiDiag.answer('priority','comfort')">Le confort</button>
+          <button type="button" onclick="octiDiag.answer('priority','discreet')">La discrétion</button>
+          <button type="button" onclick="octiDiag.answer('priority','security')">La sécurité maximale</button>
+          <button type="button" onclick="octiDiag.answer('priority','style')">Le style</button>
         </div>
       </div>
 
-      <div class="diag__question diag__question--hidden" id="q5">
-        <h2 class="diag__q-title">À quelle fréquence en avez-vous besoin ?</h2>
-        <div class="diag__options">
-          <button class="diag__option" onclick="diagAnswer('q5','daily')">📅 Tous les jours</button>
-          <button class="diag__option" onclick="diagAnswer('q5','weekly')">📆 Quelques fois par semaine</button>
-          <button class="diag__option" onclick="diagAnswer('q5','occasional')">🗓️ Occasionnellement</button>
-          <button class="diag__option" onclick="diagAnswer('q5','periodic')">🔁 Seulement les règles</button>
+      <div class="octi-question is-hidden" data-question="3">
+        <h2 class="octi-question__title">Quel type de matière préférez-vous ?</h2>
+        <div class="octi-question__answers">
+          <button type="button" onclick="octiDiag.answer('fabric','cotton')">Coton doux</button>
+          <button type="button" onclick="octiDiag.answer('fabric','technical')">Matière technique</button>
+          <button type="button" onclick="octiDiag.answer('fabric','soft')">Très douce et souple</button>
+          <button type="button" onclick="octiDiag.answer('fabric','no_pref')">Pas de préférence</button>
         </div>
       </div>
 
+      <div class="octi-question is-hidden" data-question="4">
+        <h2 class="octi-question__title">Vous souhaitez plutôt commencer comment ?</h2>
+        <div class="octi-question__answers">
+          <button type="button" onclick="octiDiag.answer('start','single')">Avec un premier modèle</button>
+          <button type="button" onclick="octiDiag.answer('start','pack')">Avec un pack</button>
+          <button type="button" onclick="octiDiag.answer('start','best')">Avec la meilleure recommandation</button>
+          <button type="button" onclick="octiDiag.answer('start','compare')">En comparant plusieurs options</button>
+        </div>
+      </div>
     </div>
 
-    <!-- RÉSULTAT -->
-    <div class="diag__screen diag__screen--hidden" id="screen-result">
-      <div class="diag__result" id="result-content"></div>
-      <button class="diag__btn diag__btn--ghost" onclick="diagRestart()">↩ Recommencer le diagnostic</button>
-    </div>
-
+    <div class="octi-diagnostic__result is-hidden" id="diag-result"></div>
   </div>
 </section>
 
 <style>
-.diag {
-  min-height: 80vh;
-  display: flex;
-  align-items: center;
-  background: #f7f6f2;
-  padding: 4rem 1.5rem;
-  font-family: inherit;
+.octi-diagnostic {
+  background: #f8f4ef;
+  padding: 56px 20px 80px;
 }
-.diag__container {
-  max-width: 640px;
+.octi-diagnostic__container {
+  max-width: 860px;
   margin: 0 auto;
-  width: 100%;
 }
-.diag__screen {
-  text-align: center;
+.octi-diagnostic__intro,
+.octi-diagnostic__quiz,
+.octi-diagnostic__result {
+  background: #fff;
+  border: 1px solid #eadfd4;
+  border-radius: 24px;
+  padding: 36px;
+  box-shadow: 0 10px 30px rgba(53, 32, 21, 0.05);
 }
-.diag__screen--hidden {
-  display: none;
-}
-.diag__eyebrow {
-  font-size: 0.78rem;
+.octi-diagnostic__kicker {
+  display: inline-block;
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: .12em;
-  color: #01696f;
-  margin-bottom: 1rem;
+  letter-spacing: .14em;
+  color: #a06f5d;
+  margin-bottom: 12px;
 }
-.diag__title {
-  font-size: clamp(2rem, 1rem + 3vw, 3.2rem);
-  font-weight: 800;
-  line-height: 1.1;
-  color: #28251d;
-  margin-bottom: 0.75rem;
+.octi-diagnostic__title {
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 1.02;
+  color: #24160f;
+  margin: 0 0 16px;
 }
-.diag__title em {
-  font-style: normal;
-  color: #01696f;
+.octi-diagnostic__title em {
+  font-style: italic;
+  color: #b7806e;
 }
-.diag__subtitle {
-  font-size: 1rem;
-  color: #7a7974;
-  margin-bottom: 2.5rem;
+.octi-diagnostic__lead {
+  max-width: 650px;
+  color: #6e5d55;
+  font-size: 17px;
+  line-height: 1.7;
+  margin: 0 0 24px;
 }
-.diag__btn {
-  display: inline-block;
-  padding: 14px 32px;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 700;
-  cursor: pointer;
-  border: none;
-  transition: background 180ms ease, transform 120ms ease;
-  text-decoration: none;
-}
-.diag__btn--primary {
-  background: #01696f;
-  color: #fff;
-}
-.diag__btn--primary:hover {
-  background: #0c4e54;
-  transform: translateY(-1px);
-}
-.diag__btn--ghost {
-  background: transparent;
-  color: #28251d;
-  border: 1.5px solid #d4d1ca;
-  margin-top: 1.5rem;
-}
-.diag__btn--ghost:hover {
-  border-color: #01696f;
-  color: #01696f;
-}
-.diag__progress {
-  height: 6px;
-  background: #e6e4df;
-  border-radius: 999px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-}
-.diag__progress-bar {
-  height: 100%;
-  background: #01696f;
-  border-radius: 999px;
-  width: 20%;
-  transition: width 400ms cubic-bezier(0.16,1,0.3,1);
-}
-.diag__step-label {
-  font-size: 0.82rem;
-  color: #7a7974;
-  font-weight: 600;
-  margin-bottom: 2rem;
-  letter-spacing: .05em;
-}
-.diag__q-title {
-  font-size: clamp(1.3rem, 1rem + 1.2vw, 1.8rem);
-  font-weight: 700;
-  color: #28251d;
-  margin-bottom: 1.75rem;
-  line-height: 1.25;
-}
-.diag__options {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-.diag__option {
-  width: 100%;
-  padding: 16px 20px;
-  background: #fff;
-  border: 1.5px solid #d4d1ca;
-  border-radius: 12px;
-  font-size: 1rem;
-  font-weight: 500;
-  color: #28251d;
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 180ms ease, background 180ms ease, transform 120ms ease;
-}
-.diag__option:hover {
-  border-color: #01696f;
-  background: #f0f7f7;
-  transform: translateX(4px);
-}
-.diag__option.selected {
-  border-color: #01696f;
-  background: #e0f0f0;
-  color: #01696f;
-  font-weight: 700;
-}
-.diag__question--hidden {
-  display: none;
-}
-/* Résultat */
-.diag__result {
-  background: #fff;
-  border: 1.5px solid #d4d1ca;
-  border-radius: 16px;
-  padding: 2.5rem 2rem;
-  margin-bottom: 1rem;
-  text-align: left;
-}
-.diag__result-badge {
-  display: inline-block;
-  background: #e0f0f0;
-  color: #01696f;
-  font-size: 0.78rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  border-radius: 999px;
-  padding: 4px 14px;
-  margin-bottom: 1.25rem;
-}
-.diag__result-emoji {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 0.75rem;
-}
-.diag__result-name {
-  font-size: 1.6rem;
-  font-weight: 800;
-  color: #28251d;
-  margin-bottom: 0.5rem;
-  line-height: 1.2;
-}
-.diag__result-desc {
-  font-size: 0.97rem;
-  color: #7a7974;
-  line-height: 1.65;
-  margin-bottom: 1.75rem;
-}
-.diag__result-specs {
+.octi-diagnostic__intro-points {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-bottom: 1.75rem;
-}
-.diag__result-spec {
-  background: #f7f6f2;
-  border: 1px solid #e6e4df;
-  border-radius: 999px;
-  padding: 5px 14px;
-  font-size: 0.82rem;
+  gap: 12px;
+  margin-bottom: 28px;
+  color: #4f3b31;
+  font-size: 14px;
   font-weight: 600;
-  color: #28251d;
 }
-.diag__result-cta {
-  display: inline-block;
-  background: #01696f;
+.octi-diagnostic__cta,
+.octi-question__answers button,
+.octi-result__actions a,
+.octi-result__actions button {
+  cursor: pointer;
+  border: 0;
+  border-radius: 14px;
+  transition: all .2s ease;
+}
+.octi-diagnostic__cta {
+  background: #24160f;
   color: #fff;
-  padding: 14px 28px;
-  border-radius: 8px;
-  font-size: 1rem;
+  padding: 16px 24px;
+  font-size: 16px;
   font-weight: 700;
+}
+.octi-diagnostic__cta:hover {
+  background: #3a2419;
+  transform: translateY(-1px);
+}
+.octi-diagnostic__topbar {
+  margin-bottom: 28px;
+}
+.octi-diagnostic__step {
+  margin: 0 0 10px;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #8c776d;
+  font-weight: 700;
+}
+.octi-diagnostic__progress {
+  width: 100%;
+  height: 10px;
+  background: #f1e8e0;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.octi-diagnostic__progress-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #b7806e 0%, #24160f 100%);
+  border-radius: 999px;
+}
+.octi-question__title {
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.2;
+  color: #24160f;
+  margin: 0 0 22px;
+}
+.octi-question__answers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+.octi-question__answers button {
+  background: #fcfaf8;
+  border: 1px solid #eadfd4;
+  padding: 18px 18px;
+  text-align: left;
+  font-size: 16px;
+  font-weight: 600;
+  color: #34231c;
+}
+.octi-question__answers button:hover {
+  border-color: #b7806e;
+  background: #fff4ef;
+  transform: translateY(-1px);
+}
+.octi-result__tag {
+  display: inline-block;
+  margin-bottom: 14px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: #f7ede7;
+  color: #9b6d5d;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.octi-result__title {
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.08;
+  margin: 0 0 12px;
+  color: #24160f;
+}
+.octi-result__text {
+  font-size: 17px;
+  line-height: 1.75;
+  color: #6e5d55;
+  margin: 0 0 22px;
+}
+.octi-result__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+.octi-result__chips span {
+  padding: 9px 12px;
+  border-radius: 999px;
+  background: #fcf6f2;
+  border: 1px solid #eadfd4;
+  font-size: 13px;
+  font-weight: 700;
+  color: #5e463b;
+}
+.octi-result__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.octi-result__actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 20px;
+  background: #24160f;
+  color: #fff;
   text-decoration: none;
-  transition: background 180ms ease;
+  font-weight: 700;
 }
-.diag__result-cta:hover {
-  background: #0c4e54;
+.octi-result__actions a:hover {
+  background: #3a2419;
 }
-@media (max-width: 480px) {
-  .diag__result {
-    padding: 1.75rem 1.25rem;
+.octi-result__actions button {
+  padding: 15px 20px;
+  background: #fff;
+  border: 1px solid #d9c9bf;
+  color: #24160f;
+  font-weight: 700;
+}
+.octi-result__actions button:hover {
+  background: #f8f4ef;
+}
+.is-hidden { display: none; }
+@media screen and (max-width: 749px) {
+  .octi-diagnostic {
+    padding: 32px 16px 52px;
+  }
+  .octi-diagnostic__intro,
+  .octi-diagnostic__quiz,
+  .octi-diagnostic__result {
+    padding: 24px;
+    border-radius: 18px;
+  }
+  .octi-question__answers {
+    grid-template-columns: 1fr;
   }
 }
 </style>
 
 <script>
-var diagAnswers = {};
-var diagCurrentQ = 1;
-
-var diagProfiles = {
-  sport: {
-    emoji: '🏃',
-    badge: 'Votre profil',
-    name: 'Sport Haute Performance',
-    desc: 'Vous avez besoin d\'une protection qui suit chaque mouvement sans compromettre la liberté. Nos culottes techniques offrent une absorption fiable et un maintien optimal pendant l\'effort.',
-    specs: ['Absorption renforcée', 'Matière technique', 'Maintien actif', 'Séchage rapide'],
-    cta_label: 'Voir la collection Sport',
-    cta_url: '/collections/all'
+window.octiDiag = {
+  current: 0,
+  total: 5,
+  answers: {},
+  results: {
+    comfort: {
+      tag: 'Votre diagnostic Octipa',
+      title: 'Le modèle Confort Quotidien semble fait pour vous',
+      text: 'Vous recherchez avant tout une culotte rassurante, agréable à porter et facile à intégrer dans votre routine. Nous vous recommandons un modèle polyvalent, doux et discret, parfait pour un usage régulier.',
+      chips: ['Confort longue durée', 'Usage quotidien', 'Discret sous les vêtements', 'Protection équilibrée'],
+      cta: '/collections/all'
+    },
+    night: {
+      tag: 'Votre diagnostic Octipa',
+      title: 'Votre priorité est une protection nuit renforcée',
+      text: 'Vous avez besoin d\'une culotte à absorption élevée, capable de rester fiable pendant plusieurs heures. Le meilleur choix pour vous est un modèle pensé pour la nuit ou les flux plus intenses.',
+      chips: ['Protection renforcée', 'Idéal la nuit', 'Flux élevé', 'Sensation de sécurité'],
+      cta: '/collections/all'
+    },
+    sport: {
+      tag: 'Votre diagnostic Octipa',
+      title: 'Un modèle actif et technique vous conviendra le mieux',
+      text: 'Comme vous cherchez une culotte à porter pendant vos mouvements, votre recommandation idéale est un modèle stable, respirant et pensé pour accompagner votre rythme sans gêne.',
+      chips: ['Matière technique', 'Bonne tenue', 'Respirant', 'Parfait pour bouger'],
+      cta: '/collections/all'
+    },
+    pack: {
+      tag: 'Votre diagnostic Octipa',
+      title: 'Commencer avec un pack est la meilleure option pour vous',
+      text: 'Vous avez intérêt à comparer plusieurs sensations d\'usage. Un pack vous permet de tester plusieurs niveaux ou plusieurs formes pour trouver rapidement votre routine idéale.',
+      chips: ['Découverte facile', 'Plusieurs options', 'Bon rapport qualité-prix', 'Idéal pour débuter'],
+      cta: '/collections/all'
+    },
+    elegant: {
+      tag: 'Votre diagnostic Octipa',
+      title: 'Vous allez aimer un modèle discret, élégant et féminin',
+      text: 'Votre priorité va vers la discrétion et le style. Le modèle le plus adapté pour vous est une culotte fine, raffinée et agréable à porter sous vos vêtements de tous les jours.',
+      chips: ['Discrétion', 'Style soigné', 'Confort souple', 'Usage urbain'],
+      cta: '/collections/all'
+    }
   },
-  night: {
-    emoji: '🌙',
-    badge: 'Votre profil',
-    name: 'Protection Nuit Complète',
-    desc: 'Pour des nuits sereines, vous avez besoin d\'une protection maximale qui s\'adapte à tous vos mouvements. Nos modèles nuit offrent jusqu\'à 300ml d\'absorption pour un sommeil sans souci.',
-    specs: ['Jusqu\'à 300ml', 'Coupe nuit évasée', 'Ultra douce', 'Toute la nuit'],
-    cta_label: 'Voir les modèles nuit',
-    cta_url: '/collections/all'
+  start() {
+    document.getElementById('diag-intro').classList.add('is-hidden');
+    document.getElementById('diag-result').classList.add('is-hidden');
+    document.getElementById('diag-quiz').classList.remove('is-hidden');
+    this.current = 0;
+    this.answers = {};
+    this.render();
   },
-  discretion: {
-    emoji: '💼',
-    badge: 'Votre profil',
-    name: 'Discrétion Quotidienne',
-    desc: 'Au bureau comme en soirée, vous voulez une protection invisible. Nos modèles fin profil s\'effacent sous tous les vêtements tout en restant parfaitement efficaces au quotidien.',
-    specs: ['Profil ultra-fin', 'Invisible sous vêtements', 'Comfort toute la journée', 'Élégant'],
-    cta_label: 'Voir les modèles discrets',
-    cta_url: '/collections/all'
+  answer(key, value) {
+    this.answers[key] = value;
+    this.current++;
+    if (this.current >= this.total) {
+      this.showResult();
+      return;
+    }
+    this.render();
   },
-  eco: {
-    emoji: '🌿',
-    badge: 'Votre profil',
-    name: 'Éco & Bien-être',
-    desc: 'Vous privilégiez les matières naturelles et durables. Nos culottes en bambou ou coton bio allient douceur, respect de la peau et efficacité pour un confort responsable.',
-    specs: ['Bambou ou coton bio', 'Hypoallergénique', 'Durable', 'Peau sensible'],
-    cta_label: 'Voir la collection Naturel',
-    cta_url: '/collections/all'
+  render() {
+    var questions = document.querySelectorAll('.octi-question');
+    questions.forEach(function(el, index) {
+      el.classList.toggle('is-hidden', index !== octiDiag.current);
+    });
+    document.getElementById('diag-step-text').textContent = 'Question ' + (this.current + 1) + ' sur 5';
+    document.getElementById('diag-progress-bar').style.width = ((this.current + 1) / this.total * 100) + '%';
   },
-  discovery: {
-    emoji: '🎁',
-    badge: 'Votre profil',
-    name: 'Pack Découverte Idéal',
-    desc: 'Vous débutez avec les culottes absorbantes. Notre Pack Découverte inclut 2 modèles complémentaires pour tester différents niveaux de protection et trouver votre préféré.',
-    specs: ['2 modèles inclus', 'Niveaux variés', '-10% économisé', 'Satisfait ou remboursé'],
-    cta_label: 'Voir le Pack Découverte',
-    cta_url: '/collections/all'
+  showResult() {
+    document.getElementById('diag-quiz').classList.add('is-hidden');
+    var resultKey = this.compute();
+    var result = this.results[resultKey];
+    var html = '' +
+      '<div class="octi-result__tag">' + result.tag + '</div>' +
+      '<h2 class="octi-result__title">' + result.title + '</h2>' +
+      '<p class="octi-result__text">' + result.text + '</p>' +
+      '<div class="octi-result__chips">' + result.chips.map(function(item){ return '<span>' + item + '</span>'; }).join('') + '</div>' +
+      '<div class="octi-result__actions">' +
+        '<a href="' + result.cta + '">Voir la recommandation</a>' +
+        '<button type="button" onclick="octiDiag.restart()">Recommencer</button>' +
+      '</div>';
+    var resultNode = document.getElementById('diag-result');
+    resultNode.innerHTML = html;
+    resultNode.classList.remove('is-hidden');
+  },
+  compute() {
+    if (this.answers.usage === 'night' || this.answers.flow === 'heavy') return 'night';
+    if (this.answers.usage === 'sport' || this.answers.fabric === 'technical') return 'sport';
+    if (this.answers.start === 'pack' || this.answers.start === 'compare') return 'pack';
+    if (this.answers.priority === 'style' || this.answers.priority === 'discreet') return 'elegant';
+    return 'comfort';
+  },
+  restart() {
+    this.start();
   }
 };
-
-function diagStart() {
-  document.getElementById('screen-intro').classList.add('diag__screen--hidden');
-  document.getElementById('screen-quiz').classList.remove('diag__screen--hidden');
-  diagCurrentQ = 1;
-  diagAnswers = {};
-  diagShowQ(1);
-}
-
-function diagShowQ(n) {
-  for (var i = 1; i <= 5; i++) {
-    var el = document.getElementById('q' + i);
-    if (el) el.classList.add('diag__question--hidden');
-  }
-  var current = document.getElementById('q' + n);
-  if (current) current.classList.remove('diag__question--hidden');
-  document.getElementById('step-label').textContent = 'Question ' + n + ' / 5';
-  document.getElementById('progress-bar').style.width = (n * 20) + '%';
-}
-
-function diagAnswer(qId, value) {
-  diagAnswers[qId] = value;
-  var opts = document.querySelectorAll('#' + qId + ' .diag__option');
-  opts.forEach(function(o) { o.classList.remove('selected'); });
-  event.currentTarget.classList.add('selected');
-  setTimeout(function() {
-    var next = diagCurrentQ + 1;
-    if (next <= 5) {
-      diagCurrentQ = next;
-      diagShowQ(next);
-    } else {
-      diagShowResult();
-    }
-  }, 350);
-}
-
-function diagShowResult() {
-  var profile = diagComputeProfile();
-  var p = diagProfiles[profile];
-  document.getElementById('result-content').innerHTML =
-    '<span class="diag__result-emoji">' + p.emoji + '</span>' +
-    '<span class="diag__result-badge">' + p.badge + '</span>' +
-    '<h2 class="diag__result-name">' + p.name + '</h2>' +
-    '<p class="diag__result-desc">' + p.desc + '</p>' +
-    '<div class="diag__result-specs">' +
-      p.specs.map(function(s){ return '<span class="diag__result-spec">' + s + '</span>'; }).join('') +
-    '</div>' +
-    '<a href="' + p.cta_url + '" class="diag__result-cta">' + p.cta_label + '</a>';
-  document.getElementById('screen-quiz').classList.add('diag__screen--hidden');
-  document.getElementById('screen-result').classList.remove('diag__screen--hidden');
-  document.getElementById('progress-bar').style.width = '100%';
-}
-
-function diagComputeProfile() {
-  var usage = diagAnswers['q1'];
-  var priority = diagAnswers['q2'];
-  var flux = diagAnswers['q3'];
-  var material = diagAnswers['q4'];
-  var freq = diagAnswers['q5'];
-  if (usage === 'sport') return 'sport';
-  if (usage === 'night' || flux === 'heavy') return 'night';
-  if (priority === 'discretion') return 'discretion';
-  if (material === 'bamboo' || material === 'cotton') return 'eco';
-  if (freq === 'occasional' || freq === 'periodic') return 'discovery';
-  return 'discretion';
-}
-
-function diagRestart() {
-  diagAnswers = {};
-  diagCurrentQ = 1;
-  document.getElementById('screen-result').classList.add('diag__screen--hidden');
-  document.getElementById('screen-intro').classList.remove('diag__screen--hidden');
-  document.getElementById('progress-bar').style.width = '20%';
-}
 </script>
 
 {% schema %}
 {
-  "name": "Diagnostic Quiz",
-  "tag": "section",
-  "class": "section-diagnostic",
-  "settings": [
-    { "type": "text", "id": "title", "label": "Titre", "default": "Trouvez votre culotte idéale" }
-  ],
-  "presets": [{ "name": "Diagnostic Quiz" }]
+  "name": "Diagnostic",
+  "settings": [],
+  "presets": [
+    {
+      "name": "Diagnostic"
+    }
+  ]
 }
 {% endschema %}

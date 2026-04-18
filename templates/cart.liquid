@@ -1,6 +1,6 @@
 {%- comment -%}
   Template: cart
-  Description: Page panier complète Octipa + bloc upsell
+  Description: Page panier complète Octipa + upsell via section dédiée
 {%- endcomment -%}
 
 <section class="section">
@@ -51,7 +51,6 @@
         <div style="border-top:1px solid var(--color-divider);padding-top:1.5rem;margin-top:1rem;text-align:right">
           <p style="font-size:var(--text-lg);font-weight:700;margin-bottom:.5rem">Total : {{ cart.total_price | money }}</p>
           <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:1.5rem">✓ Livraison offerte dès 49€</p>
-
           <div style="display:flex;gap:1rem;justify-content:flex-end;flex-wrap:wrap">
             <button type="submit" name="update" class="btn btn--secondary" style="font-size:.875rem">Mettre à jour</button>
             <button type="submit" name="checkout" class="btn btn--primary btn--lg">Commander →</button>
@@ -60,169 +59,8 @@
 
       </form>
 
-      <!-- ===== BLOC UPSELL ===== -->
-      {%- assign cart_product_ids = cart.items | map: 'product_id' -%}
-      {%- assign upsell_product = nil -%}
-
-      {%- for product in collections.all.products limit: 12 -%}
-        {%- unless cart_product_ids contains product.id -%}
-          {%- if upsell_product == nil -%}
-            {%- assign upsell_product = product -%}
-          {%- endif -%}
-        {%- endunless -%}
-      {%- endfor -%}
-
-      {%- if upsell_product != nil -%}
-        <div class="octi-upsell" id="octi-upsell">
-          <div class="octi-upsell__header">
-            <span class="octi-upsell__badge">✦ Souvent choisi ensemble</span>
-            <button class="octi-upsell__close" onclick="document.getElementById('octi-upsell').style.display='none'" aria-label="Fermer">&times;</button>
-          </div>
-
-          <div class="octi-upsell__inner">
-            {%- if upsell_product.featured_image -%}
-              <div class="octi-upsell__img-wrap">
-                <img
-                  src="{{ upsell_product.featured_image | image_url: width: 320 }}"
-                  alt="{{ upsell_product.title | escape }}"
-                  width="90"
-                  height="90"
-                  loading="lazy"
-                  class="octi-upsell__img"
-                >
-              </div>
-            {%- endif -%}
-
-            <div class="octi-upsell__info">
-              <p class="octi-upsell__title">{{ upsell_product.title }}</p>
-              <p class="octi-upsell__price">{{ upsell_product.price | money }}</p>
-              {%- if upsell_product.description != blank -%}
-                <p class="octi-upsell__desc">{{ upsell_product.description | strip_html | truncate: 80 }}</p>
-              {%- endif -%}
-            </div>
-
-            <div class="octi-upsell__action">
-              {%- if upsell_product.variants.size > 1 -%}
-                <a href="{{ upsell_product.url }}" class="octi-upsell__btn">Voir le produit →</a>
-              {%- else -%}
-                <form action="/cart/add" method="post">
-                  <input type="hidden" name="id" value="{{ upsell_product.selected_or_first_available_variant.id }}">
-                  <input type="hidden" name="quantity" value="1">
-                  <button type="submit" class="octi-upsell__btn">Ajouter au panier</button>
-                </form>
-              {%- endif -%}
-            </div>
-          </div>
-        </div>
-      {%- endif -%}
-      <!-- ===== FIN UPSELL ===== -->
+      {%- render 'cart-upsell' -%}
 
     {%- endif -%}
   </div>
 </section>
-
-<style>
-.octi-upsell {
-  margin-top: 2rem;
-  background: #fff;
-  border: 1.5px solid #eadfd4;
-  border-radius: 20px;
-  padding: 20px 24px;
-  box-shadow: 0 8px 32px rgba(40,20,10,.07);
-  animation: upsell-in .45s cubic-bezier(.16,1,.3,1) both;
-}
-@keyframes upsell-in {
-  from { opacity:0; transform:translateY(14px); }
-  to   { opacity:1; transform:translateY(0); }
-}
-.octi-upsell__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 16px;
-}
-.octi-upsell__badge {
-  font-size: 11px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: .1em;
-  color: #a06f5d;
-  background: #f7ede7;
-  border: 1px solid #edd5c8;
-  border-radius: 999px;
-  padding: 5px 12px;
-}
-.octi-upsell__close {
-  background: none;
-  border: none;
-  font-size: 20px;
-  color: #b0a09a;
-  cursor: pointer;
-  line-height: 1;
-  padding: 4px 8px;
-  border-radius: 8px;
-  transition: background .15s;
-}
-.octi-upsell__close:hover { background: #f3ede8; }
-.octi-upsell__inner {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  flex-wrap: wrap;
-}
-.octi-upsell__img-wrap { flex-shrink: 0; }
-.octi-upsell__img {
-  width: 90px;
-  height: 90px;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 1px solid #eadfd4;
-}
-.octi-upsell__info {
-  flex: 1;
-  min-width: 140px;
-}
-.octi-upsell__title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #1e110a;
-  margin: 0 0 4px;
-  line-height: 1.3;
-}
-.octi-upsell__price {
-  font-size: 14px;
-  font-weight: 600;
-  color: #a06f5d;
-  margin: 0 0 4px;
-}
-.octi-upsell__desc {
-  font-size: 12px;
-  color: #8a7a72;
-  margin: 0;
-  line-height: 1.5;
-}
-.octi-upsell__action { flex-shrink: 0; }
-.octi-upsell__btn {
-  display: inline-block;
-  background: #1e110a;
-  color: #fff;
-  font-size: 13px;
-  font-weight: 700;
-  padding: 12px 20px;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  text-decoration: none;
-  transition: background .2s, transform .15s;
-  white-space: nowrap;
-}
-.octi-upsell__btn:hover {
-  background: #3a2419;
-  transform: translateY(-1px);
-}
-@media (max-width: 600px) {
-  .octi-upsell__inner { flex-direction: column; align-items: flex-start; }
-  .octi-upsell__action { width: 100%; }
-  .octi-upsell__btn { width: 100%; text-align: center; }
-}
-</style>

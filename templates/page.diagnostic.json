@@ -1,0 +1,9 @@
+{
+  "sections": {
+    "main": {
+      "type": "diagnostic",
+      "settings": {}
+    }
+  },
+  "order": ["main"]
+}

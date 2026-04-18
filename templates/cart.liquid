@@ -20,11 +20,7 @@
           <div class="cart-item">
             {{- item.image
               | image_url: width: 160
-              | image_tag:
-                loading: 'lazy',
-                width: 80,
-                height: 100,
-                alt: item.title | escape
+              | image_tag: loading: 'lazy', width: 80, height: 100, alt: item.title
             -}}
             <div style="flex:1">
               <div class="cart-item-name">{{ item.product.title }}</div>
@@ -66,18 +62,17 @@
 
       <!-- ===== BLOC UPSELL ===== -->
       {%- assign cart_product_ids = cart.items | map: 'product_id' -%}
-      {%- assign upsell_shown = false -%}
+      {%- assign upsell_product = nil -%}
 
       {%- for product in collections.all.products limit: 12 -%}
         {%- unless cart_product_ids contains product.id -%}
-          {%- if upsell_shown == false -%}
+          {%- if upsell_product == nil -%}
             {%- assign upsell_product = product -%}
-            {%- assign upsell_shown = true -%}
           {%- endif -%}
         {%- endunless -%}
       {%- endfor -%}
 
-      {%- if upsell_shown -%}
+      {%- if upsell_product != nil -%}
         <div class="octi-upsell" id="octi-upsell">
           <div class="octi-upsell__header">
             <span class="octi-upsell__badge">✦ Souvent choisi ensemble</span>
@@ -87,15 +82,14 @@
           <div class="octi-upsell__inner">
             {%- if upsell_product.featured_image -%}
               <div class="octi-upsell__img-wrap">
-                {{- upsell_product.featured_image
-                  | image_url: width: 320
-                  | image_tag:
-                    loading: 'lazy',
-                    width: 120,
-                    height: 120,
-                    alt: upsell_product.title | escape,
-                    class: 'octi-upsell__img'
-                -}}
+                <img
+                  src="{{ upsell_product.featured_image | image_url: width: 320 }}"
+                  alt="{{ upsell_product.title | escape }}"
+                  width="90"
+                  height="90"
+                  loading="lazy"
+                  class="octi-upsell__img"
+                >
               </div>
             {%- endif -%}
 
@@ -176,9 +170,7 @@
   gap: 16px;
   flex-wrap: wrap;
 }
-.octi-upsell__img-wrap {
-  flex-shrink: 0;
-}
+.octi-upsell__img-wrap { flex-shrink: 0; }
 .octi-upsell__img {
   width: 90px;
   height: 90px;
@@ -209,9 +201,7 @@
   margin: 0;
   line-height: 1.5;
 }
-.octi-upsell__action {
-  flex-shrink: 0;
-}
+.octi-upsell__action { flex-shrink: 0; }
 .octi-upsell__btn {
   display: inline-block;
   background: #1e110a;

@@ -1,5 +1,7 @@
 {%- comment -%}
-  Template: cart — Page panier Octipa avec upsell intégré
+  Template: cart — Page panier Octipa
+  Upsell piloté par le metafield : shop.metafields.octipa.upsell_product (type: product reference)
+  Réglage : Admin Shopify → Paramètres → Champs personnalisés → Boutique → "upsell_product"
 {%- endcomment -%}
 
 <section class="section">
@@ -50,13 +52,33 @@
       </form>
 
       <!-- UPSELL -->
-      {%- assign cart_product_ids = cart.items | map: 'product_id' -%}
-      {%- assign upsell_product = nil -%}
-      {%- for product in collections.all.products limit: 20 -%}
-        {%- unless cart_product_ids contains product.id -%}
-          {%- if upsell_product == nil -%}{%- assign upsell_product = product -%}{%- endif -%}
-        {%- endunless -%}
-      {%- endfor -%}
+      {%- liquid
+        assign upsell_product = nil
+        assign cart_product_ids = cart.items | map: 'product_id'
+
+        comment
+          Priorité 1 : metafield shop octipa.upsell_product (product reference)
+        endcomment
+        if shop.metafields.octipa.upsell_product != blank
+          assign meta_product = shop.metafields.octipa.upsell_product.value
+          unless cart_product_ids contains meta_product.id
+            assign upsell_product = meta_product
+          endunless
+        endif
+
+        comment
+          Priorité 2 : fallback automatique (premier produit absent du panier)
+        endcomment
+        if upsell_product == nil
+          for product in collections.all.products limit: 20
+            unless cart_product_ids contains product.id
+              if upsell_product == nil
+                assign upsell_product = product
+              endif
+            endunless
+          endfor
+        endif
+      -%}
 
       {%- if upsell_product != nil -%}
         <div class="octi-upsell" id="octi-upsell">

@@ -1,6 +1,5 @@
 {%- comment -%}
-  Template: cart
-  Description: Page panier complète Octipa + upsell via section dédiée
+  Template: cart (legacy fallback — le template actif est cart.json)
 {%- endcomment -%}
 
 <section class="section">
@@ -18,10 +17,14 @@
 
         {%- for item in cart.items -%}
           <div class="cart-item">
-            {{- item.image
-              | image_url: width: 160
-              | image_tag: loading: 'lazy', width: 80, height: 100, alt: item.title
-            -}}
+            <img
+              src="{{ item.image | image_url: width: 160 }}"
+              alt="{{ item.title | escape }}"
+              width="80"
+              height="100"
+              loading="lazy"
+              style="border-radius:8px;object-fit:cover;"
+            >
             <div style="flex:1">
               <div class="cart-item-name">{{ item.product.title }}</div>
               {%- unless item.variant.title == 'Default Title' -%}
@@ -58,9 +61,6 @@
         </div>
 
       </form>
-
-      {%- render 'cart-upsell' -%}
-
     {%- endif -%}
   </div>
 </section>

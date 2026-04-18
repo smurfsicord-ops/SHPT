@@ -1,6 +1,173 @@
+{%- if page.handle == 'diagnostic' -%}
+
+<section class="octi-diag">
+  <div class="octi-diag__wrap">
+
+    <div id="diag-intro">
+      <p class="octi-diag__kicker">Diagnostic gratuit</p>
+      <h1 class="octi-diag__h1">Trouvez la culotte <em>faite pour vous</em></h1>
+      <p class="octi-diag__lead">5 questions &middot; 2 minutes &middot; Recommandation personnalis&eacute;e</p>
+      <button class="octi-diag__btn" onclick="octiQ.start()">Commencer &rarr;</button>
+    </div>
+
+    <div id="diag-quiz" class="octi-diag__hidden">
+      <div class="octi-diag__topbar">
+        <span id="diag-label">Question 1 / 5</span>
+        <div class="octi-diag__bar"><div id="diag-fill" style="width:20%"></div></div>
+      </div>
+
+      <div class="octi-q" id="qq0">
+        <h2>Dans quelle situation porterez-vous votre culotte ?</h2>
+        <div class="octi-q__opts">
+          <button onclick="octiQ.pick('usage','daily')">Au quotidien</button>
+          <button onclick="octiQ.pick('usage','night')">La nuit</button>
+          <button onclick="octiQ.pick('usage','sport')">Pendant le sport</button>
+          <button onclick="octiQ.pick('usage','mixed')">Un peu tout</button>
+        </div>
+      </div>
+
+      <div class="octi-q octi-diag__hidden" id="qq1">
+        <h2>Quel niveau de flux recherchez-vous ?</h2>
+        <div class="octi-q__opts">
+          <button onclick="octiQ.pick('flow','light')">L&eacute;ger</button>
+          <button onclick="octiQ.pick('flow','medium')">Mod&eacute;r&eacute;</button>
+          <button onclick="octiQ.pick('flow','heavy')">&Eacute;lev&eacute;</button>
+          <button onclick="octiQ.pick('flow','variable')">Variable</button>
+        </div>
+      </div>
+
+      <div class="octi-q octi-diag__hidden" id="qq2">
+        <h2>Quelle qualit&eacute; est la plus importante pour vous ?</h2>
+        <div class="octi-q__opts">
+          <button onclick="octiQ.pick('priority','comfort')">Le confort</button>
+          <button onclick="octiQ.pick('priority','discreet')">La discr&eacute;tion</button>
+          <button onclick="octiQ.pick('priority','security')">La s&eacute;curit&eacute;</button>
+          <button onclick="octiQ.pick('priority','style')">Le style</button>
+        </div>
+      </div>
+
+      <div class="octi-q octi-diag__hidden" id="qq3">
+        <h2>Quelle mati&egrave;re pr&eacute;f&eacute;rez-vous ?</h2>
+        <div class="octi-q__opts">
+          <button onclick="octiQ.pick('fabric','cotton')">Coton doux</button>
+          <button onclick="octiQ.pick('fabric','technical')">Technique</button>
+          <button onclick="octiQ.pick('fabric','soft')">Tr&egrave;s souple</button>
+          <button onclick="octiQ.pick('fabric','any')">Pas de pr&eacute;f&eacute;rence</button>
+        </div>
+      </div>
+
+      <div class="octi-q octi-diag__hidden" id="qq4">
+        <h2>Comment souhaitez-vous commencer ?</h2>
+        <div class="octi-q__opts">
+          <button onclick="octiQ.pick('start','single')">Un seul mod&egrave;le</button>
+          <button onclick="octiQ.pick('start','pack')">Un pack</button>
+          <button onclick="octiQ.pick('start','best')">La meilleure option</button>
+          <button onclick="octiQ.pick('start','compare')">Comparer</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="diag-result" class="octi-diag__hidden"></div>
+
+  </div>
+</section>
+
+<style>
+.octi-diag{background:#f8f4ef;min-height:80vh;display:flex;align-items:center;padding:56px 20px}
+.octi-diag__wrap{max-width:780px;margin:0 auto;width:100%;background:#fff;border:1px solid #eadfd4;border-radius:24px;padding:48px;box-shadow:0 12px 40px rgba(40,20,10,.06)}
+.octi-diag__kicker{font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.14em;color:#a06f5d;margin-bottom:14px;display:block}
+.octi-diag__h1{font-size:clamp(32px,5vw,52px);line-height:1.05;color:#1e110a;margin:0 0 14px}
+.octi-diag__h1 em{font-style:italic;color:#b7806e}
+.octi-diag__lead{font-size:17px;color:#6e5d55;margin:0 0 28px;line-height:1.7}
+.octi-diag__btn{background:#1e110a;color:#fff;border:0;border-radius:12px;padding:16px 28px;font-size:16px;font-weight:700;cursor:pointer;transition:background .2s,transform .15s}
+.octi-diag__btn:hover{background:#3a2419;transform:translateY(-1px)}
+.octi-diag__hidden{display:none}
+.octi-diag__topbar{margin-bottom:28px}
+.octi-diag__topbar span{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:#8c776d;display:block;margin-bottom:10px}
+.octi-diag__bar{width:100%;height:8px;background:#f1e8e0;border-radius:999px;overflow:hidden}
+.octi-diag__bar div{height:100%;background:linear-gradient(90deg,#b7806e,#1e110a);border-radius:999px;transition:width .4s cubic-bezier(.16,1,.3,1)}
+.octi-q h2{font-size:clamp(22px,3vw,32px);color:#1e110a;margin:0 0 24px;line-height:1.2}
+.octi-q__opts{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.octi-q__opts button{background:#fdfaf7;border:1.5px solid #eadfd4;border-radius:14px;padding:18px 16px;font-size:15px;font-weight:600;color:#34231c;text-align:left;cursor:pointer;transition:all .18s ease}
+.octi-q__opts button:hover{border-color:#b7806e;background:#fff4ef;transform:translateY(-2px)}
+.octi-result__tag{display:inline-block;padding:7px 14px;border-radius:999px;background:#f7ede7;color:#9b6d5d;font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:16px}
+.octi-result__h2{font-size:clamp(26px,4vw,40px);color:#1e110a;margin:0 0 12px;line-height:1.15}
+.octi-result__p{font-size:16px;color:#6e5d55;line-height:1.75;margin:0 0 22px}
+.octi-result__chips{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:28px}
+.octi-result__chips span{padding:8px 14px;border-radius:999px;background:#fcf6f2;border:1px solid #eadfd4;font-size:13px;font-weight:700;color:#5e463b}
+.octi-result__actions{display:flex;flex-wrap:wrap;gap:12px}
+.octi-result__actions a{display:inline-flex;align-items:center;justify-content:center;padding:15px 24px;background:#1e110a;color:#fff;text-decoration:none;font-weight:700;border-radius:12px;transition:background .2s}
+.octi-result__actions a:hover{background:#3a2419}
+.octi-result__actions button{padding:15px 24px;background:#fff;border:1.5px solid #d9c9bf;color:#1e110a;font-weight:700;border-radius:12px;cursor:pointer;transition:background .2s}
+.octi-result__actions button:hover{background:#f8f4ef}
+@media(max-width:640px){.octi-diag__wrap{padding:28px 20px;border-radius:18px}.octi-q__opts{grid-template-columns:1fr}}
+</style>
+
+<script>
+var octiQ={
+  step:0,
+  answers:{},
+  profiles:{
+    night:{tag:'Votre profil Octipa',title:'Protection Nuit & Flux Intense',text:'Vous avez besoin d\'une culotte à absorption maximale. Notre modèle nuit tient toute la nuit sans fuite, avec une coupe enveloppante et rassurante.',chips:['Jusqu\'à 300ml','Coupe nuit','Ultra sécurisée','Bambou doux'],url:'/collections/all'},
+    sport:{tag:'Votre profil Octipa',title:'Modèle Sport & Activité',text:'Une culotte technique qui suit chaque mouvement. Respirante, maintien parfait, absorption fiable pendant l\'effort.',chips:['Matière technique','Respirante','Maintien actif','Flux modéré'],url:'/collections/all'},
+    elegant:{tag:'Votre profil Octipa',title:'Modèle Discret & Élégant',text:'Fine, invisible sous vos vêtements, stylée. La culotte idéale pour le bureau, les sorties et les journées chargées.',chips:['Profil ultra-fin','Invisible','Stylée','Quotidien'],url:'/collections/all'},
+    pack:{tag:'Votre profil Octipa',title:'Pack Découverte Recommandé',text:'Pour tester plusieurs sensations, notre pack vous offre 2 à 4 modèles complémentaires au meilleur prix.',chips:['2-4 modèles','Économique','-15%','Satisfait ou remboursé'],url:'/collections/all'},
+    comfort:{tag:'Votre profil Octipa',title:'Modèle Confort Quotidien',text:'Doux, rassurant, polyvalent. Le modèle culotte le plus plébiscité par nos clientes pour un usage régulier.',chips:['Confort longue durée','Quotidien','Flux équilibré','Discrète'],url:'/collections/all'}
+  },
+  start:function(){
+    document.getElementById('diag-intro').style.display='none';
+    document.getElementById('diag-result').className='octi-diag__hidden';
+    document.getElementById('diag-quiz').classList.remove('octi-diag__hidden');
+    this.step=0;this.answers={};
+    this.render();
+  },
+  pick:function(k,v){
+    this.answers[k]=v;
+    this.step++;
+    if(this.step>=5){this.result();return;}
+    this.render();
+  },
+  render:function(){
+    for(var i=0;i<5;i++){
+      var el=document.getElementById('qq'+i);
+      el&&(el.className=i===this.step?'octi-q':'octi-q octi-diag__hidden');
+    }
+    document.getElementById('diag-label').textContent='Question '+(this.step+1)+' / 5';
+    document.getElementById('diag-fill').style.width=((this.step+1)/5*100)+'%';
+  },
+  compute:function(){
+    var a=this.answers;
+    if(a.usage==='night'||a.flow==='heavy')return'night';
+    if(a.usage==='sport'||a.fabric==='technical')return'sport';
+    if(a.start==='pack'||a.start==='compare')return'pack';
+    if(a.priority==='style'||a.priority==='discreet')return'elegant';
+    return'comfort';
+  },
+  result:function(){
+    document.getElementById('diag-quiz').className='octi-diag__hidden';
+    var p=this.profiles[this.compute()];
+    var chips=p.chips.map(function(c){return'<span>'+c+'</span>';}).join('');
+    document.getElementById('diag-result').innerHTML=
+      '<div class="octi-result__tag">'+p.tag+'</div>'+
+      '<h2 class="octi-result__h2">'+p.title+'</h2>'+
+      '<p class="octi-result__p">'+p.text+'</p>'+
+      '<div class="octi-result__chips">'+chips+'</div>'+
+      '<div class="octi-result__actions">'+
+        '<a href="'+p.url+'">Voir la recommandation &rarr;</a>'+
+        '<button onclick="octiQ.start()">Recommencer</button>'+
+      '</div>';
+    document.getElementById('diag-result').classList.remove('octi-diag__hidden');
+  }
+};
+</script>
+
+{%- else -%}
+
 <section class="section">
   <div class="container container--narrow">
     <h1 class="section-title" style="margin-bottom:2rem">{{ page.title }}</h1>
     <div style="font-size:var(--text-base);color:var(--color-text-muted);line-height:1.8">{{ page.content }}</div>
   </div>
 </section>
+
+{%- endif -%}

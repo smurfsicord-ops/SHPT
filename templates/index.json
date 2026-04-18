@@ -396,6 +396,7 @@
     },
     "featured-blog": {
       "type": "featured-blog",
+      "disabled": true,
       "settings": {
         "eyebrow": "Nos conseils",
         "title": "Le journal **Octipa**",

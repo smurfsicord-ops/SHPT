@@ -29,6 +29,31 @@
     },
     "collection-products": {
       "type": "page-catalogue",
+      "blocks": {
+        "product_DGXWcN": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        },
+        "product_8mgPj6": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        },
+        "product_D4nNFd": {
+          "type": "product",
+          "settings": {
+            "product": ""
+          }
+        }
+      },
+      "block_order": [
+        "product_DGXWcN",
+        "product_8mgPj6",
+        "product_D4nNFd"
+      ],
       "settings": {
         "use_collection": true,
         "heading": "Notre Catalogue",

@@ -1,510 +1,433 @@
 {%- comment -%}
   Section: diagnostic
-  Description: Quiz diagnostic Octipa — recommande le produit idéal
+  Quiz autonome — 5 étapes, résultats personnalisés
 {%- endcomment -%}
 
 <section class="diag" id="diagnostic">
   <div class="diag__container">
 
-    {%- comment -%} INTRO {%- endcomment -%}
-    <div class="diag__intro" id="diag-intro">
-      <p class="diag__eyebrow">Votre profil</p>
-      <h1 class="diag__heading">{{ section.settings.heading | default: 'Trouvez votre sous-vêtement idéal' }}</h1>
-      <p class="diag__subheading">{{ section.settings.subheading | default: 'Répondez à 5 questions pour recevoir une recommandation personnalisée.' }}</p>
-      <button class="btn btn--primary btn--lg diag__start" onclick="diagStart()">Commencer le diagnostic →</button>
+    <!-- INTRO -->
+    <div class="diag__screen" id="screen-intro">
+      <p class="diag__eyebrow">Outil gratuit</p>
+      <h1 class="diag__title">Trouvez votre culotte <em>idéale</em></h1>
+      <p class="diag__subtitle">5 questions · 2 minutes · Résultat personnalisé</p>
+      <button class="diag__btn diag__btn--primary" onclick="diagStart()">Commencer le diagnostic →</button>
     </div>
 
-    {%- comment -%} QUIZ {%- endcomment -%}
-    <div class="diag__quiz" id="diag-quiz" style="display:none">
+    <!-- QUIZ -->
+    <div class="diag__screen diag__screen--hidden" id="screen-quiz">
 
-      <div class="diag__progress-wrap" aria-label="Progression">
-        <div class="diag__progress-bar">
-          <div class="diag__progress-fill" id="diag-progress"></div>
+      <!-- Barre de progression -->
+      <div class="diag__progress">
+        <div class="diag__progress-bar" id="progress-bar"></div>
+      </div>
+      <p class="diag__step-label" id="step-label">Question 1 / 5</p>
+
+      <!-- Questions -->
+      <div class="diag__question" id="q1">
+        <h2 class="diag__q-title">Quel est votre usage principal ?</h2>
+        <div class="diag__options">
+          <button class="diag__option" onclick="diagAnswer('q1','sport')">🏃 Sport & activité physique</button>
+          <button class="diag__option" onclick="diagAnswer('q1','daily')">💼 Quotidien & travail</button>
+          <button class="diag__option" onclick="diagAnswer('q1','night')">🌙 Protection nocturne</button>
+          <button class="diag__option" onclick="diagAnswer('q1','travel')">✈️ Voyages & sorties</button>
         </div>
-        <span class="diag__progress-label" id="diag-progress-label">Question 1 / 5</span>
       </div>
 
-      <div class="diag__questions" id="diag-questions"></div>
-
-      <div class="diag__nav">
-        <button class="btn btn--ghost" id="diag-prev" onclick="diagPrev()" style="display:none">← Précédent</button>
-        <button class="btn btn--primary" id="diag-next" onclick="diagNext()" disabled>Suivant →</button>
+      <div class="diag__question diag__question--hidden" id="q2">
+        <h2 class="diag__q-title">Quelle est votre priorité absolue ?</h2>
+        <div class="diag__options">
+          <button class="diag__option" onclick="diagAnswer('q2','absorption')">💧 Absorption maximale</button>
+          <button class="diag__option" onclick="diagAnswer('q2','discretion')">👗 Discrétion sous les vêtements</button>
+          <button class="diag__option" onclick="diagAnswer('q2','comfort')">🌸 Confort et douceur</button>
+          <button class="diag__option" onclick="diagAnswer('q2','style')">✨ Style et élégance</button>
+        </div>
       </div>
+
+      <div class="diag__question diag__question--hidden" id="q3">
+        <h2 class="diag__q-title">Comment décrivez-vous votre flux ?</h2>
+        <div class="diag__options">
+          <button class="diag__option" onclick="diagAnswer('q3','light')">🟢 Léger — quelques gouttes</button>
+          <button class="diag__option" onclick="diagAnswer('q3','moderate')">🟡 Modéré — fuites régulières</button>
+          <button class="diag__option" onclick="diagAnswer('q3','heavy')">🔴 Abondant — protection totale</button>
+          <button class="diag__option" onclick="diagAnswer('q3','variable')">🔄 Variable selon les jours</button>
+        </div>
+      </div>
+
+      <div class="diag__question diag__question--hidden" id="q4">
+        <h2 class="diag__q-title">Quelle matière préférez-vous ?</h2>
+        <div class="diag__options">
+          <button class="diag__option" onclick="diagAnswer('q4','cotton')">🌿 Coton naturel</button>
+          <button class="diag__option" onclick="diagAnswer('q4','microfiber')">⚡ Microfibre légère</button>
+          <button class="diag__option" onclick="diagAnswer('q4','bamboo')">🎋 Bambou doux</button>
+          <button class="diag__option" onclick="diagAnswer('q4','technical')">🔬 Technique haute performance</button>
+        </div>
+      </div>
+
+      <div class="diag__question diag__question--hidden" id="q5">
+        <h2 class="diag__q-title">À quelle fréquence en avez-vous besoin ?</h2>
+        <div class="diag__options">
+          <button class="diag__option" onclick="diagAnswer('q5','daily')">📅 Tous les jours</button>
+          <button class="diag__option" onclick="diagAnswer('q5','weekly')">📆 Quelques fois par semaine</button>
+          <button class="diag__option" onclick="diagAnswer('q5','occasional')">🗓️ Occasionnellement</button>
+          <button class="diag__option" onclick="diagAnswer('q5','periodic')">🔁 Seulement les règles</button>
+        </div>
+      </div>
+
     </div>
 
-    {%- comment -%} RÉSULTAT {%- endcomment -%}
-    <div class="diag__result" id="diag-result" style="display:none">
-      <div class="diag__result-icon">✓</div>
-      <p class="diag__eyebrow">Votre recommandation</p>
-      <h2 class="diag__result-title" id="diag-result-title"></h2>
-      <p class="diag__result-desc" id="diag-result-desc"></p>
-      <div class="diag__result-tags" id="diag-result-tags"></div>
-      <div class="diag__result-actions">
-        <a href="#" class="btn btn--primary btn--lg" id="diag-result-cta">Voir les produits →</a>
-        <button class="btn btn--ghost" onclick="diagRestart()">Recommencer</button>
-      </div>
+    <!-- RÉSULTAT -->
+    <div class="diag__screen diag__screen--hidden" id="screen-result">
+      <div class="diag__result" id="result-content"></div>
+      <button class="diag__btn diag__btn--ghost" onclick="diagRestart()">↩ Recommencer le diagnostic</button>
     </div>
 
   </div>
 </section>
 
-{% javascript %}
-var DIAG_QUESTIONS = [
-  {
-    id: 'usage',
-    question: 'Quel est votre usage principal ?',
-    icon: '🎯',
-    options: [
-      { value: 'sport', label: 'Sport & activité physique', icon: '🏃' },
-      { value: 'quotidien', label: 'Confort au quotidien', icon: '☁️' },
-      { value: 'nuit', label: 'Nuit & sommeil', icon: '🌙' },
-      { value: 'travail', label: 'Travail & sorties', icon: '💼' }
-    ]
-  },
-  {
-    id: 'priorite',
-    question: 'Quelle est votre priorité absolue ?',
-    icon: '⭐',
-    options: [
-      { value: 'absorption', label: 'Absorption maximale', icon: '💧' },
-      { value: 'discretion', label: 'Discrétion totale', icon: '👁️' },
-      { value: 'confort', label: 'Confort & douceur', icon: '🌸' },
-      { value: 'style', label: 'Style & esthétique', icon: '✨' }
-    ]
-  },
-  {
-    id: 'flux',
-    question: 'Comment décririez-vous votre flux ?',
-    icon: '📊',
-    options: [
-      { value: 'leger', label: 'Léger — quelques gouttes', icon: '🟢' },
-      { value: 'modere', label: 'Modéré — flux régulier', icon: '🟡' },
-      { value: 'abondant', label: 'Abondant — flux important', icon: '🟠' },
-      { value: 'variable', label: 'Variable — ça dépend des jours', icon: '🔄' }
-    ]
-  },
-  {
-    id: 'morpho',
-    question: 'Quelle matière préférez-vous contre la peau ?',
-    icon: '👗',
-    options: [
-      { value: 'coton', label: 'Coton naturel', icon: '🌿' },
-      { value: 'micro', label: 'Microfibre douce', icon: '🪶' },
-      { value: 'bambou', label: 'Bambou & matières éco', icon: '🎋' },
-      { value: 'sport', label: 'Technique sport', icon: '⚡' }
-    ]
-  },
-  {
-    id: 'frequence',
-    question: 'À quelle fréquence portez-vous ce type de produit ?',
-    icon: '📅',
-    options: [
-      { value: 'toujours', label: 'Tous les jours', icon: '🔁' },
-      { value: 'souvent', label: 'Plusieurs fois par semaine', icon: '📆' },
-      { value: 'parfois', label: 'Occasionnellement', icon: '🗓️' },
-      { value: 'premiere', label: 'C\'est ma première fois', icon: '🌟' }
-    ]
+<style>
+.diag {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  background: #f7f6f2;
+  padding: 4rem 1.5rem;
+  font-family: inherit;
+}
+.diag__container {
+  max-width: 640px;
+  margin: 0 auto;
+  width: 100%;
+}
+.diag__screen {
+  text-align: center;
+}
+.diag__screen--hidden {
+  display: none;
+}
+.diag__eyebrow {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  color: #01696f;
+  margin-bottom: 1rem;
+}
+.diag__title {
+  font-size: clamp(2rem, 1rem + 3vw, 3.2rem);
+  font-weight: 800;
+  line-height: 1.1;
+  color: #28251d;
+  margin-bottom: 0.75rem;
+}
+.diag__title em {
+  font-style: normal;
+  color: #01696f;
+}
+.diag__subtitle {
+  font-size: 1rem;
+  color: #7a7974;
+  margin-bottom: 2.5rem;
+}
+.diag__btn {
+  display: inline-block;
+  padding: 14px 32px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: background 180ms ease, transform 120ms ease;
+  text-decoration: none;
+}
+.diag__btn--primary {
+  background: #01696f;
+  color: #fff;
+}
+.diag__btn--primary:hover {
+  background: #0c4e54;
+  transform: translateY(-1px);
+}
+.diag__btn--ghost {
+  background: transparent;
+  color: #28251d;
+  border: 1.5px solid #d4d1ca;
+  margin-top: 1.5rem;
+}
+.diag__btn--ghost:hover {
+  border-color: #01696f;
+  color: #01696f;
+}
+.diag__progress {
+  height: 6px;
+  background: #e6e4df;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+.diag__progress-bar {
+  height: 100%;
+  background: #01696f;
+  border-radius: 999px;
+  width: 20%;
+  transition: width 400ms cubic-bezier(0.16,1,0.3,1);
+}
+.diag__step-label {
+  font-size: 0.82rem;
+  color: #7a7974;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  letter-spacing: .05em;
+}
+.diag__q-title {
+  font-size: clamp(1.3rem, 1rem + 1.2vw, 1.8rem);
+  font-weight: 700;
+  color: #28251d;
+  margin-bottom: 1.75rem;
+  line-height: 1.25;
+}
+.diag__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.diag__option {
+  width: 100%;
+  padding: 16px 20px;
+  background: #fff;
+  border: 1.5px solid #d4d1ca;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #28251d;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, background 180ms ease, transform 120ms ease;
+}
+.diag__option:hover {
+  border-color: #01696f;
+  background: #f0f7f7;
+  transform: translateX(4px);
+}
+.diag__option.selected {
+  border-color: #01696f;
+  background: #e0f0f0;
+  color: #01696f;
+  font-weight: 700;
+}
+.diag__question--hidden {
+  display: none;
+}
+/* Résultat */
+.diag__result {
+  background: #fff;
+  border: 1.5px solid #d4d1ca;
+  border-radius: 16px;
+  padding: 2.5rem 2rem;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+.diag__result-badge {
+  display: inline-block;
+  background: #e0f0f0;
+  color: #01696f;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  border-radius: 999px;
+  padding: 4px 14px;
+  margin-bottom: 1.25rem;
+}
+.diag__result-emoji {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.diag__result-name {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #28251d;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+.diag__result-desc {
+  font-size: 0.97rem;
+  color: #7a7974;
+  line-height: 1.65;
+  margin-bottom: 1.75rem;
+}
+.diag__result-specs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.diag__result-spec {
+  background: #f7f6f2;
+  border: 1px solid #e6e4df;
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #28251d;
+}
+.diag__result-cta {
+  display: inline-block;
+  background: #01696f;
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 180ms ease;
+}
+.diag__result-cta:hover {
+  background: #0c4e54;
+}
+@media (max-width: 480px) {
+  .diag__result {
+    padding: 1.75rem 1.25rem;
   }
-];
+}
+</style>
 
-var DIAG_RESULTS = [
-  {
-    key: 'sport-absorption',
-    match: function(a) { return a.usage === 'sport' || a.priorite === 'absorption' || a.flux === 'abondant'; },
-    title: 'Le Modèle Sport Haute Absorption',
-    desc: 'Conçu pour les actives, ce modèle combine absorption maximale et maintien sportif. Technologie anti-fuite même en mouvement.',
-    tags: ['Haute absorption', 'Anti-fuite', 'Sport'],
-    cta: '/collections/all'
-  },
-  {
-    key: 'nuit-confort',
-    match: function(a) { return a.usage === 'nuit' || (a.priorite === 'confort' && a.flux !== 'abondant'); },
-    title: 'Le Modèle Nuit & Confort',
-    desc: 'Douceur maximale pour des nuits sereines. Matière respirante, coupe enveloppante et absorption nocturne optimisée.',
-    tags: ['Ultra-doux', 'Nuit', 'Respirant'],
-    cta: '/collections/all'
-  },
-  {
-    key: 'discret-quotidien',
-    match: function(a) { return a.priorite === 'discretion' || a.usage === 'travail'; },
-    title: 'Le Modèle Discrétion Quotidienne',
-    desc: 'Invisible sous tous les vêtements. Finitions ultra-plates, sans couture apparente, pour une confiance totale au quotidien.',
-    tags: ['Invisible', 'Sans couture', 'Quotidien'],
-    cta: '/collections/all'
-  },
-  {
-    key: 'eco-style',
-    match: function(a) { return a.priorite === 'style' || a.morpho === 'bambou'; },
-    title: 'Le Modèle Éco & Style',
-    desc: 'Pour celles qui ne veulent pas sacrifier le style. Bambou certifié OEKO-TEX, coupes modernes et couleurs exclusives.',
-    tags: ['Éco-responsable', 'Bambou', 'Design'],
-    cta: '/collections/all'
-  },
-  {
-    key: 'decouverte',
-    match: function(a) { return a.frequence === 'premiere' || a.flux === 'leger'; },
-    title: 'Le Pack Découverte Octipa',
-    desc: 'Vous débutez ? Le pack découverte inclut 3 modèles différents pour trouver celui qui vous correspond parfaitement.',
-    tags: ['Pack découverte', '3 modèles', 'Idéal débutante'],
-    cta: '/collections/all'
-  }
-];
-
+<script>
 var diagAnswers = {};
-var diagStep = 0;
+var diagCurrentQ = 1;
+
+var diagProfiles = {
+  sport: {
+    emoji: '🏃',
+    badge: 'Votre profil',
+    name: 'Sport Haute Performance',
+    desc: 'Vous avez besoin d\'une protection qui suit chaque mouvement sans compromettre la liberté. Nos culottes techniques offrent une absorption fiable et un maintien optimal pendant l\'effort.',
+    specs: ['Absorption renforcée', 'Matière technique', 'Maintien actif', 'Séchage rapide'],
+    cta_label: 'Voir la collection Sport',
+    cta_url: '/collections/all'
+  },
+  night: {
+    emoji: '🌙',
+    badge: 'Votre profil',
+    name: 'Protection Nuit Complète',
+    desc: 'Pour des nuits sereines, vous avez besoin d\'une protection maximale qui s\'adapte à tous vos mouvements. Nos modèles nuit offrent jusqu\'à 300ml d\'absorption pour un sommeil sans souci.',
+    specs: ['Jusqu\'à 300ml', 'Coupe nuit évasée', 'Ultra douce', 'Toute la nuit'],
+    cta_label: 'Voir les modèles nuit',
+    cta_url: '/collections/all'
+  },
+  discretion: {
+    emoji: '💼',
+    badge: 'Votre profil',
+    name: 'Discrétion Quotidienne',
+    desc: 'Au bureau comme en soirée, vous voulez une protection invisible. Nos modèles fin profil s\'effacent sous tous les vêtements tout en restant parfaitement efficaces au quotidien.',
+    specs: ['Profil ultra-fin', 'Invisible sous vêtements', 'Comfort toute la journée', 'Élégant'],
+    cta_label: 'Voir les modèles discrets',
+    cta_url: '/collections/all'
+  },
+  eco: {
+    emoji: '🌿',
+    badge: 'Votre profil',
+    name: 'Éco & Bien-être',
+    desc: 'Vous privilégiez les matières naturelles et durables. Nos culottes en bambou ou coton bio allient douceur, respect de la peau et efficacité pour un confort responsable.',
+    specs: ['Bambou ou coton bio', 'Hypoallergénique', 'Durable', 'Peau sensible'],
+    cta_label: 'Voir la collection Naturel',
+    cta_url: '/collections/all'
+  },
+  discovery: {
+    emoji: '🎁',
+    badge: 'Votre profil',
+    name: 'Pack Découverte Idéal',
+    desc: 'Vous débutez avec les culottes absorbantes. Notre Pack Découverte inclut 2 modèles complémentaires pour tester différents niveaux de protection et trouver votre préféré.',
+    specs: ['2 modèles inclus', 'Niveaux variés', '-10% économisé', 'Satisfait ou remboursé'],
+    cta_label: 'Voir le Pack Découverte',
+    cta_url: '/collections/all'
+  }
+};
 
 function diagStart() {
-  document.getElementById('diag-intro').style.display = 'none';
-  document.getElementById('diag-quiz').style.display = 'block';
-  diagRender();
+  document.getElementById('screen-intro').classList.add('diag__screen--hidden');
+  document.getElementById('screen-quiz').classList.remove('diag__screen--hidden');
+  diagCurrentQ = 1;
+  diagAnswers = {};
+  diagShowQ(1);
 }
 
-function diagRender() {
-  var q = DIAG_QUESTIONS[diagStep];
-  var total = DIAG_QUESTIONS.length;
-  var pct = ((diagStep) / total * 100).toFixed(0);
-
-  document.getElementById('diag-progress').style.width = pct + '%';
-  document.getElementById('diag-progress-label').textContent = 'Question ' + (diagStep + 1) + ' / ' + total;
-
-  var current = diagAnswers[q.id];
-  var html = '<div class="diag__question" role="group" aria-labelledby="diag-q-title">';
-  html += '<p class="diag__q-icon">' + q.icon + '</p>';
-  html += '<h2 class="diag__q-title" id="diag-q-title">' + q.question + '</h2>';
-  html += '<ul class="diag__options" role="list">';
-  q.options.forEach(function(opt) {
-    var sel = current === opt.value ? ' diag__option--selected' : '';
-    html += '<li>';
-    html += '<button class="diag__option' + sel + '" onclick="diagSelect(\'' + opt.value + '\')" aria-pressed="' + (current === opt.value ? 'true' : 'false') + '">';
-    html += '<span class="diag__option-icon">' + opt.icon + '</span>';
-    html += '<span class="diag__option-label">' + opt.label + '</span>';
-    if (current === opt.value) html += '<span class="diag__option-check">✓</span>';
-    html += '</button></li>';
-  });
-  html += '</ul></div>';
-  document.getElementById('diag-questions').innerHTML = html;
-
-  document.getElementById('diag-prev').style.display = diagStep > 0 ? 'inline-flex' : 'none';
-  var nextBtn = document.getElementById('diag-next');
-  nextBtn.disabled = !current;
-  nextBtn.textContent = diagStep === total - 1 ? 'Voir mon résultat ✓' : 'Suivant →';
-}
-
-function diagSelect(val) {
-  diagAnswers[DIAG_QUESTIONS[diagStep].id] = val;
-  diagRender();
-}
-
-function diagNext() {
-  if (diagStep < DIAG_QUESTIONS.length - 1) {
-    diagStep++;
-    diagRender();
-  } else {
-    diagShowResult();
+function diagShowQ(n) {
+  for (var i = 1; i <= 5; i++) {
+    var el = document.getElementById('q' + i);
+    if (el) el.classList.add('diag__question--hidden');
   }
+  var current = document.getElementById('q' + n);
+  if (current) current.classList.remove('diag__question--hidden');
+  document.getElementById('step-label').textContent = 'Question ' + n + ' / 5';
+  document.getElementById('progress-bar').style.width = (n * 20) + '%';
 }
 
-function diagPrev() {
-  if (diagStep > 0) { diagStep--; diagRender(); }
+function diagAnswer(qId, value) {
+  diagAnswers[qId] = value;
+  var opts = document.querySelectorAll('#' + qId + ' .diag__option');
+  opts.forEach(function(o) { o.classList.remove('selected'); });
+  event.currentTarget.classList.add('selected');
+  setTimeout(function() {
+    var next = diagCurrentQ + 1;
+    if (next <= 5) {
+      diagCurrentQ = next;
+      diagShowQ(next);
+    } else {
+      diagShowResult();
+    }
+  }, 350);
 }
 
 function diagShowResult() {
-  document.getElementById('diag-quiz').style.display = 'none';
-  var result = null;
-  for (var i = 0; i < DIAG_RESULTS.length; i++) {
-    if (DIAG_RESULTS[i].match(diagAnswers)) { result = DIAG_RESULTS[i]; break; }
-  }
-  if (!result) result = DIAG_RESULTS[0];
+  var profile = diagComputeProfile();
+  var p = diagProfiles[profile];
+  document.getElementById('result-content').innerHTML =
+    '<span class="diag__result-emoji">' + p.emoji + '</span>' +
+    '<span class="diag__result-badge">' + p.badge + '</span>' +
+    '<h2 class="diag__result-name">' + p.name + '</h2>' +
+    '<p class="diag__result-desc">' + p.desc + '</p>' +
+    '<div class="diag__result-specs">' +
+      p.specs.map(function(s){ return '<span class="diag__result-spec">' + s + '</span>'; }).join('') +
+    '</div>' +
+    '<a href="' + p.cta_url + '" class="diag__result-cta">' + p.cta_label + '</a>';
+  document.getElementById('screen-quiz').classList.add('diag__screen--hidden');
+  document.getElementById('screen-result').classList.remove('diag__screen--hidden');
+  document.getElementById('progress-bar').style.width = '100%';
+}
 
-  document.getElementById('diag-result-title').textContent = result.title;
-  document.getElementById('diag-result-desc').textContent = result.desc;
-
-  var tagsHtml = '';
-  result.tags.forEach(function(t) { tagsHtml += '<span class="diag__tag">' + t + '</span>'; });
-  document.getElementById('diag-result-tags').innerHTML = tagsHtml;
-  document.getElementById('diag-result-cta').href = result.cta;
-
-  var el = document.getElementById('diag-result');
-  el.style.display = 'block';
-  el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+function diagComputeProfile() {
+  var usage = diagAnswers['q1'];
+  var priority = diagAnswers['q2'];
+  var flux = diagAnswers['q3'];
+  var material = diagAnswers['q4'];
+  var freq = diagAnswers['q5'];
+  if (usage === 'sport') return 'sport';
+  if (usage === 'night' || flux === 'heavy') return 'night';
+  if (priority === 'discretion') return 'discretion';
+  if (material === 'bamboo' || material === 'cotton') return 'eco';
+  if (freq === 'occasional' || freq === 'periodic') return 'discovery';
+  return 'discretion';
 }
 
 function diagRestart() {
   diagAnswers = {};
-  diagStep = 0;
-  document.getElementById('diag-result').style.display = 'none';
-  document.getElementById('diag-intro').style.display = 'block';
+  diagCurrentQ = 1;
+  document.getElementById('screen-result').classList.add('diag__screen--hidden');
+  document.getElementById('screen-intro').classList.remove('diag__screen--hidden');
+  document.getElementById('progress-bar').style.width = '20%';
 }
-{% endjavascript %}
-
-{% stylesheet %}
-/* ============================================================
-   DIAGNOSTIC — Octipa
-   ============================================================ */
-
-.diag {
-  padding-block: clamp(3rem, 7vw, 6rem);
-  background: var(--color-bg, #faf8f6);
-  min-height: 70vh;
-  display: flex;
-  align-items: center;
-}
-
-.diag__container {
-  width: 100%;
-  max-width: 680px;
-  margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2rem);
-}
-
-/* EYEBROW */
-.diag__eyebrow {
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: .13em;
-  text-transform: uppercase;
-  color: var(--color-primary, #c4756a);
-  margin-bottom: .6rem;
-  text-align: center;
-}
-
-/* INTRO */
-.diag__intro { text-align: center; }
-
-.diag__heading {
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(1.8rem, 1.2rem + 2.5vw, 2.8rem);
-  font-weight: 700;
-  color: var(--color-text, #28251d);
-  line-height: 1.2;
-  margin-bottom: 1rem;
-}
-
-.diag__subheading {
-  font-size: clamp(0.95rem, 0.9rem + 0.2vw, 1.05rem);
-  color: var(--color-text-muted, #7a7974);
-  max-width: 48ch;
-  margin-inline: auto;
-  margin-bottom: 2rem;
-  line-height: 1.65;
-}
-
-.diag__start { margin-inline: auto; }
-
-/* PROGRESS */
-.diag__progress-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 2rem;
-}
-
-.diag__progress-bar {
-  flex: 1;
-  height: 6px;
-  background: var(--color-border, #e8e4de);
-  border-radius: 99px;
-  overflow: hidden;
-}
-
-.diag__progress-fill {
-  height: 100%;
-  background: var(--color-primary, #c4756a);
-  border-radius: 99px;
-  transition: width 300ms ease;
-  width: 0%;
-}
-
-.diag__progress-label {
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-text-muted, #7a7974);
-  white-space: nowrap;
-}
-
-/* QUESTION */
-.diag__question { animation: diagFadeIn 250ms ease; }
-
-@keyframes diagFadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-
-.diag__q-icon {
-  font-size: 2rem;
-  text-align: center;
-  margin-bottom: .5rem;
-}
-
-.diag__q-title {
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(1.2rem, 1rem + 1vw, 1.6rem);
-  font-weight: 700;
-  color: var(--color-text, #28251d);
-  text-align: center;
-  margin-bottom: 1.5rem;
-  line-height: 1.3;
-}
-
-/* OPTIONS */
-.diag__options {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: grid;
-  gap: 10px;
-}
-
-.diag__option {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  width: 100%;
-  padding: 14px 18px;
-  background: var(--color-surface, #fff);
-  border: 1.5px solid var(--color-border, #e8e4de);
-  border-radius: 12px;
-  cursor: pointer;
-  text-align: left;
-  transition: border-color 150ms ease, background 150ms ease, transform 100ms ease;
-}
-
-.diag__option:hover {
-  border-color: var(--color-primary, #c4756a);
-  background: #fdf5f3;
-  transform: translateY(-1px);
-}
-
-.diag__option--selected {
-  border-color: var(--color-primary, #c4756a);
-  background: #fdf5f3;
-  box-shadow: 0 0 0 3px rgba(196, 117, 106, .15);
-}
-
-.diag__option-icon {
-  font-size: 1.4rem;
-  flex-shrink: 0;
-  width: 36px;
-  text-align: center;
-}
-
-.diag__option-label {
-  flex: 1;
-  font-size: 0.95rem;
-  font-weight: 500;
-  color: var(--color-text, #28251d);
-  line-height: 1.3;
-}
-
-.diag__option-check {
-  font-size: 1rem;
-  color: var(--color-primary, #c4756a);
-  font-weight: 700;
-  flex-shrink: 0;
-}
-
-/* NAV */
-.diag__nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 1.5rem;
-  gap: 12px;
-}
-
-/* RÉSULTAT */
-.diag__result {
-  text-align: center;
-  animation: diagFadeIn 350ms ease;
-}
-
-.diag__result-icon {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: var(--color-primary, #c4756a);
-  color: #fff;
-  font-size: 1.8rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
-  box-shadow: 0 8px 24px rgba(196, 117, 106, .3);
-}
-
-.diag__result-title {
-  font-family: var(--font-display, Georgia, serif);
-  font-size: clamp(1.4rem, 1rem + 1.5vw, 2rem);
-  font-weight: 700;
-  color: var(--color-text, #28251d);
-  margin-bottom: 1rem;
-  line-height: 1.3;
-}
-
-.diag__result-desc {
-  font-size: 1rem;
-  color: var(--color-text-muted, #7a7974);
-  max-width: 50ch;
-  margin-inline: auto;
-  line-height: 1.7;
-  margin-bottom: 1.5rem;
-}
-
-.diag__result-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 2rem;
-}
-
-.diag__tag {
-  display: inline-flex;
-  align-items: center;
-  padding: 5px 12px;
-  background: #fdf5f3;
-  border: 1px solid rgba(196,117,106,.3);
-  border-radius: 99px;
-  font-size: 0.78rem;
-  font-weight: 600;
-  color: var(--color-primary, #c4756a);
-  letter-spacing: .04em;
-}
-
-.diag__result-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-@media (min-width: 480px) {
-  .diag__options { grid-template-columns: 1fr 1fr; }
-  .diag__result-actions { flex-direction: row; justify-content: center; }
-}
-{% endstylesheet %}
+</script>
 
 {% schema %}
 {
-  "name": "Diagnostic",
+  "name": "Diagnostic Quiz",
   "tag": "section",
   "class": "section-diagnostic",
   "settings": [
-    {
-      "type": "text",
-      "id": "heading",
-      "label": "Titre",
-      "default": "Trouvez votre sous-v\u00eatement id\u00e9al"
-    },
-    {
-      "type": "textarea",
-      "id": "subheading",
-      "label": "Sous-titre",
-      "default": "R\u00e9pondez \u00e0 5 questions pour recevoir une recommandation personnalis\u00e9e."
-    }
+    { "type": "text", "id": "title", "label": "Titre", "default": "Trouvez votre culotte idéale" }
   ],
-  "presets": [
-    { "name": "Diagnostic" }
-  ]
+  "presets": [{ "name": "Diagnostic Quiz" }]
 }
 {% endschema %}

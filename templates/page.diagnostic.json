@@ -1,12 +1,9 @@
 {
   "sections": {
-    "diagnostic-main": {
+    "diagnostic": {
       "type": "diagnostic",
-      "settings": {
-        "heading": "Trouvez votre sous-v\u00eatement id\u00e9al",
-        "subheading": "R\u00e9pondez \u00e0 5 questions pour recevoir une recommandation personnalis\u00e9e."
-      }
+      "settings": {}
     }
   },
-  "order": ["diagnostic-main"]
+  "order": ["diagnostic"]
 }

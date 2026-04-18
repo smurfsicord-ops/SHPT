@@ -1,7 +1,6 @@
 {%- comment -%}
   Template: cart — Page panier Octipa
-  Upsell piloté par le metafield : shop.metafields.octipa.upsell_product (type: product reference)
-  Réglage : Admin Shopify → Contenu → Boutique → Produit upsell
+  Upsell : variante "-20%" hardcodée (ID: 64250157826397)
 {%- endcomment -%}
 
 <section class="section">
@@ -55,14 +54,12 @@
       {%- liquid
         assign upsell_product = nil
         assign cart_product_ids = cart.items | map: 'product_id'
-
         if shop.metafields.octipa.upsell_product != blank
           assign meta_product = shop.metafields.octipa.upsell_product.value
           unless cart_product_ids contains meta_product.id
             assign upsell_product = meta_product
           endunless
         endif
-
         if upsell_product == nil
           for product in collections.all.products limit: 20
             unless cart_product_ids contains product.id
@@ -75,9 +72,13 @@
       -%}
 
       {%- if upsell_product != nil -%}
+        {%- assign upsell_variant_id = 64250157826397 -%}
+        {%- assign upsell_normal_price = upsell_product.price -%}
+        {%- assign upsell_discounted_price = upsell_product.price | times: 0.8 -%}
+
         <div class="octi-upsell" id="octi-upsell">
           <div class="octi-upsell__header">
-            <span class="octi-upsell__badge">✦ Souvent choisi ensemble</span>
+            <span class="octi-upsell__badge">✦ Offre exclusive — -20%</span>
             <button class="octi-upsell__close" onclick="this.closest('.octi-upsell').style.display='none'" aria-label="Fermer">&times;</button>
           </div>
           <div class="octi-upsell__inner">
@@ -86,21 +87,21 @@
             {%- endif -%}
             <div class="octi-upsell__info">
               <p class="octi-upsell__title">{{ upsell_product.title }}</p>
-              <p class="octi-upsell__price">{{ upsell_product.price | money }}</p>
+              <div class="octi-upsell__prices">
+                <span class="octi-upsell__price-old">{{ upsell_normal_price | money }}</span>
+                <span class="octi-upsell__price-new">{{ upsell_discounted_price | money }}</span>
+                <span class="octi-upsell__badge-pct">-20%</span>
+              </div>
               {%- if upsell_product.description != blank -%}
                 <p class="octi-upsell__desc">{{ upsell_product.description | strip_html | truncate: 90 }}</p>
               {%- endif -%}
             </div>
             <div class="octi-upsell__action">
-              {%- if upsell_product.variants.size > 1 -%}
-                <a href="{{ upsell_product.url }}" class="octi-upsell__btn">Voir le produit →</a>
-              {%- else -%}
-                <form action="/cart/add" method="post">
-                  <input type="hidden" name="id" value="{{ upsell_product.selected_or_first_available_variant.id }}">
-                  <input type="hidden" name="quantity" value="1">
-                  <button type="submit" class="octi-upsell__btn">Ajouter au panier</button>
-                </form>
-              {%- endif -%}
+              <form action="/cart/add" method="post">
+                <input type="hidden" name="id" value="{{ upsell_variant_id }}">
+                <input type="hidden" name="quantity" value="1">
+                <button type="submit" class="octi-upsell__btn">Ajouter — {{ upsell_discounted_price | money }}</button>
+              </form>
             </div>
           </div>
         </div>
@@ -120,8 +121,11 @@
 .octi-upsell__inner{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
 .octi-upsell__img{width:90px;height:90px;object-fit:cover;border-radius:12px;border:1px solid #eadfd4;flex-shrink:0}
 .octi-upsell__info{flex:1;min-width:140px}
-.octi-upsell__title{font-size:15px;font-weight:700;color:#1e110a;margin:0 0 4px;line-height:1.3}
-.octi-upsell__price{font-size:14px;font-weight:600;color:#a06f5d;margin:0 0 4px}
+.octi-upsell__title{font-size:15px;font-weight:700;color:#1e110a;margin:0 0 6px;line-height:1.3}
+.octi-upsell__prices{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px}
+.octi-upsell__price-old{font-size:13px;color:#b0a09a;text-decoration:line-through}
+.octi-upsell__price-new{font-size:16px;font-weight:800;color:#a06f5d}
+.octi-upsell__badge-pct{font-size:11px;font-weight:800;color:#fff;background:#a06f5d;border-radius:999px;padding:2px 8px}
 .octi-upsell__desc{font-size:12px;color:#8a7a72;margin:0;line-height:1.5}
 .octi-upsell__action{flex-shrink:0}
 .octi-upsell__btn{display:inline-block;background:#1e110a;color:#fff;font-size:13px;font-weight:700;padding:12px 20px;border-radius:12px;border:none;cursor:pointer;text-decoration:none;transition:background .2s,transform .15s;white-space:nowrap}

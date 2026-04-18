@@ -80,7 +80,9 @@
 
 <style>
 .octi-upsell {
-  margin-top: 2rem;
+  max-width: 860px;
+  margin: 2rem auto 0;
+  padding: 0 1rem;
   background: #fff;
   border: 1.5px solid #eadfd4;
   border-radius: 20px;
@@ -135,10 +137,7 @@
   border-radius: 12px;
   border: 1px solid #eadfd4;
 }
-.octi-upsell__info {
-  flex: 1;
-  min-width: 140px;
-}
+.octi-upsell__info { flex: 1; min-width: 140px; }
 .octi-upsell__title {
   font-size: 15px;
   font-weight: 700;
@@ -173,10 +172,7 @@
   transition: background .2s, transform .15s;
   white-space: nowrap;
 }
-.octi-upsell__btn:hover {
-  background: #3a2419;
-  transform: translateY(-1px);
-}
+.octi-upsell__btn:hover { background: #3a2419; transform: translateY(-1px); }
 @media (max-width: 600px) {
   .octi-upsell__inner { flex-direction: column; align-items: flex-start; }
   .octi-upsell__action { width: 100%; }
@@ -187,7 +183,6 @@
 {% schema %}
 {
   "name": "Upsell panier",
-  "tag": "div",
   "settings": [
     {
       "type": "header",
@@ -197,7 +192,7 @@
       "type": "product",
       "id": "product",
       "label": "Produit upsell",
-      "info": "Laissez vide pour afficher automatiquement un produit non présent dans le panier."
+      "info": "Laissez vide pour afficher automatiquement un produit absent du panier."
     },
     {
       "type": "checkbox",
@@ -225,7 +220,7 @@
       "type": "text",
       "id": "btn_label_variants",
       "label": "Bouton \u2014 plusieurs variantes",
-      "default": "Voir le produit →"
+      "default": "Voir le produit \u2192"
     },
     {
       "type": "header",
@@ -239,9 +234,7 @@
     }
   ],
   "presets": [
-    {
-      "name": "Upsell panier"
-    }
+    { "name": "Upsell panier" }
   ]
 }
 {% endschema %}

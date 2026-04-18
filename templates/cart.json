@@ -1,0 +1,19 @@
+{
+  "sections": {
+    "cart-main": {
+      "type": "cart-main",
+      "settings": {}
+    },
+    "cart-upsell": {
+      "type": "cart-upsell",
+      "settings": {
+        "badge_text": "\u2726 Souvent choisi ensemble",
+        "btn_label_add": "Ajouter au panier",
+        "btn_label_variants": "Voir le produit \u2192",
+        "show_description": true,
+        "show_close": true
+      }
+    }
+  },
+  "order": ["cart-main", "cart-upsell"]
+}
